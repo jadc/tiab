@@ -4,6 +4,8 @@
   "package": "red.jad.notimetotick.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "PlayerEntityMixin",
+    "ServerPlayerEntityMixin"
   ],
   "client": [
   ],

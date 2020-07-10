@@ -30,7 +30,5 @@ public class NTTT implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, id("time_in_a_bottle"), TIME_IN_A_BOTTLE);
-
-		//FabricDefaultAttributeRegistry.register(TICKER, TickerEntity.createAttributes());
 	}
 }
