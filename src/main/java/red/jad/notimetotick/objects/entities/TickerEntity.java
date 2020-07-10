@@ -12,51 +12,55 @@ import net.minecraft.network.Packet;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import red.jad.notimetotick.backend.Config;
 import red.jad.notimetotick.backend.SpawnPacketHelper;
 
 public class TickerEntity extends Entity {
 
-    private static final TrackedData<Integer> LEVEL = DataTracker.registerData(TickerEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Byte> LEVEL = DataTracker.registerData(TickerEntity.class, TrackedDataHandlerRegistry.BYTE);
 
-    BlockPos pos;
     public TickerEntity(EntityType<?> type, World world) {
         super(type, world);
-        pos = new BlockPos((int)this.getX(), (int)this.getY(), (int)this.getZ());
     }
 
     @Override
     public void tick() {
         super.tick();
-        //System.out.println(pos);
-        if(this.world.getTime() % 10 == 0) world.setBlockState(pos, Blocks.STONE.getDefaultState());
-        //this.getEntityWorld().addImportantParticle(ParticleTypes.CLOUD, true, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+        BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
+
+        // Duration
+        if(this.age > (Config.baseDuration * Math.pow(Config.multiplier, this.getLevel())) * Config.ticksPerSecond) this.kill();
+
+
+        //this.getEntityWorld().addImportantParticle(ParticleTypes.CLOUD, true, this.getX(), this.getY(), this.getZ(), 0, 0, 0)
+        world.breakBlock(target, true);
     }
 
-    public void setLevel(int level){
+    public void setLevel(byte level){
         if (!this.world.isClient) {
-            this.getDataTracker().set(LEVEL, level);
+            this.getDataTracker().set(LEVEL, level < 0 ? 0 : level);
         }
     }
 
-    public int getLevel(){
-        return (Integer)this.getDataTracker().get(LEVEL);
+    public byte getLevel(){
+        return (Byte)this.getDataTracker().get(LEVEL);
     }
 
     @Override
     protected void initDataTracker() {
-        this.getDataTracker().startTracking(LEVEL, 0);
+        this.getDataTracker().startTracking(LEVEL, (byte)0);
     }
 
     @Override
     protected void readCustomDataFromTag(CompoundTag tag) {
         if (tag.contains("Level", 99)) {
-            this.setLevel(tag.getInt("Level"));
+            this.setLevel(tag.getByte("Level"));
         }
     }
 
     @Override
     protected void writeCustomDataToTag(CompoundTag tag) {
-        tag.putInt("Level", this.getLevel());
+        tag.putByte("Level", this.getLevel());
     }
 
     @Override
