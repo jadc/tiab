@@ -2,21 +2,29 @@ package red.jad.notimetotick.objects.items;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import red.jad.notimetotick.NTTT;
 import red.jad.notimetotick.access.PlayerEntityAccess;
 import red.jad.notimetotick.backend.Config;
+import red.jad.notimetotick.backend.TimeFormatter;
 import red.jad.notimetotick.objects.entities.TickerEntity;
+
+import java.util.Optional;
 
 public class TimeBottleItem extends Item {
 
@@ -28,6 +36,10 @@ public class TimeBottleItem extends Item {
         );
     }
 
+    private long getStoredTicks(PlayerEntity player){
+        return player.world.getTime() - ((PlayerEntityAccess)player).getNTTTBottleLastUsed();
+    }
+
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -36,74 +48,80 @@ public class TimeBottleItem extends Item {
             if(entity instanceof PlayerEntity){
                 PlayerEntity player = (PlayerEntity) entity;
 
-                // HUD
-                if(selected) player.sendMessage(new LiteralText(ticksToTime(((PlayerEntityAccess)player).getStoredTicks())), true);
+                boolean hasTimeBottle = false;
+                for(int i = 0; i < player.inventory.size(); i++){
+                    if(player.inventory.getStack(i).getItem() == this){
+                        hasTimeBottle = true;
+                        break;
+                    }
+                }
 
-                // Time accumulation
-                if(player.world.getTime() % Config.ticksPerSecond == 0 || Config.ticksPerSecond == 0){
-                    Inventory inv = player.inventory;
-                    boolean hasTimeBottle = false;
-                    for(int i = 0; i < inv.size(); i++){
-                        if(inv.getStack(i).getItem() == this){
-                            hasTimeBottle = true;
-                            break;
+                if(hasTimeBottle){
+                    if(world.getTime() % 20 == 0){
+
+                        long diff = world.getTime() - ((PlayerEntityAccess)player).getNTTTBottleLastEquipped();
+                        ((PlayerEntityAccess)player).setNTTTBottleLastUsed(((PlayerEntityAccess)player).getNTTTBottleLastUsed() + diff);
+
+                        // Initialize
+                        if(((PlayerEntityAccess)player).getNTTTBottleLastUsed() == 0){
+                            ((PlayerEntityAccess)player).setNTTTBottleLastUsed(world.getTime());
+                        }
+
+                        ((PlayerEntityAccess)player).setNTTTBottleLastEquipped(world.getTime() + 20);
+                        // HUD
+                        if(selected){
+                            String hud = "∞";
+                            if(!player.isCreative()) hud = TimeFormatter.ticksToTime(getStoredTicks(player));
+                            player.sendMessage(new LiteralText(hud), true);
                         }
                     }
-                    if(hasTimeBottle) ((PlayerEntityAccess)player).setStoredTicks(((PlayerEntityAccess)player).getStoredTicks() + 20);
                 }
+
             }
         }
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getBlockPos();
         BlockState state = world.getBlockState(pos);
 
         if(state.getBlock().hasRandomTicks(state) || state.getBlock().hasBlockEntity()){
-            if(player != null && (((PlayerEntityAccess)player).getStoredTicks() ) >= Config.baseDuration*20){
+            if(player != null && (getStoredTicks(player) >= Config.baseDuration*20 || player.isCreative())){
                 if(!world.isClient){
-                    // remove ticks from player
-                    ((PlayerEntityAccess)player).setStoredTicks(((PlayerEntityAccess)player).getStoredTicks() - Config.baseDuration*20);
 
                     // add said ticks to ticker
-                    TickerEntity ticker = new TickerEntity(NTTT.TICKER, world);
-                    ticker.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-                    world.spawnEntity(ticker);
+                    Optional<TickerEntity> tickers = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
-                    player.getItemCooldownManager().set(this, 10);
+                    boolean canAfford = false;
+                    long cost = Config.baseDuration;
+
+                    if(!tickers.isPresent()){
+                        NTTT.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
+                        canAfford = true;
+                    }else{
+                        cost = (long) (Config.baseDuration * Math.pow(Config.multiplier, tickers.get().getLevel() + 1));
+                        if(getStoredTicks(player) >= cost*20 || player.isCreative()){
+                            tickers.get().setLevel(tickers.get().getLevel() + 1);
+                            tickers.get().age = 0;
+                            canAfford = true;
+                        }
+                    }
+
+                    // remove ticks from player
+                    if(canAfford){
+                        if(!player.isCreative()) ((PlayerEntityAccess)player).setNTTTBottleLastUsed(((PlayerEntityAccess)player).getNTTTBottleLastUsed() + cost*20);
+
+                        // sfx
+                        world.playSound(null, pos, SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, SoundCategory.BLOCKS, 1f, 1f);
+                    }
                 }else{
                     player.swingHand(context.getHand());
                 }
             }
-
         }
-        return ActionResult.PASS;
+        return ActionResult.CONSUME;
     }
-
-    // Time in a Bottle Specific Methods
-
-    public String ticksToTime(int ticks) {
-        String delimiter = ":";
-
-        int hours = ((ticks / 20) / 60) / 60;
-        int minutes = ((ticks / 20) / 60) % 60;
-        int seconds = (ticks / 20) % 60;
-
-        String hoursLZ, minutesLZ, secondsLZ;
-
-        hoursLZ = "" + hours;
-        minutesLZ = ((hours > 0 && minutes < 10) ? "0" : "") + minutes;
-        secondsLZ = ((seconds < 10 && minutes > 0) ? "0" : "") + seconds;
-
-        if (ticks > (20 * 60 * 60))
-            return hoursLZ + delimiter + minutesLZ + delimiter + secondsLZ;
-        if (ticks > (20 * 60))
-            return minutesLZ + delimiter + secondsLZ;
-        return secondsLZ;
-    }
-
 }
