@@ -1,6 +1,12 @@
 package red.jad.notimetotick.access;
 
+/*
+Interface to allow access to custom nbt methods
+ */
+
 public interface PlayerEntityAccess {
-    int getStoredTicks();
-    void setStoredTicks(int ticks);
+    long getNTTTBottleLastEquipped();
+    void setNTTTBottleLastEquipped(long ticks);
+    long getNTTTBottleLastUsed();
+    void setNTTTBottleLastUsed(long ticks);
 }
