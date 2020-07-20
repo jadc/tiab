@@ -1,30 +1,23 @@
 package red.jad.notimetotick.objects.items;
 
-import net.minecraft.block.BlockState;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.ActionResult;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import red.jad.notimetotick.NTTT;
-import red.jad.notimetotick.access.PlayerEntityAccess;
 import red.jad.notimetotick.backend.Config;
 import red.jad.notimetotick.backend.TimeFormatter;
-import red.jad.notimetotick.objects.entities.TickerEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 public class TimeBottleItem extends Item {
 
@@ -36,10 +29,50 @@ public class TimeBottleItem extends Item {
         );
     }
 
-    private long getStoredTicks(PlayerEntity player){
-        return player.world.getTime() - ((PlayerEntityAccess)player).getNTTTBottleLastUsed();
+    /*
+    NBT
+     */
+    private void setLastUsed(ItemStack stack, long last){
+        CompoundTag tag = getOrCreateTag(stack);
+        tag.putLong("lastUsed", last);
+        stack.setTag(tag);
     }
 
+    private long getLastUsed(ItemStack stack){
+        CompoundTag tag = getOrCreateTag(stack);
+        if(tag.contains("lastUsed")){
+            return tag.getLong("lastUsed");
+        }
+        return 0;
+    }
+
+    private void setLastEquipped(ItemStack stack, long last){
+        CompoundTag tag = getOrCreateTag(stack);
+        tag.putLong("lastEquipped", last);
+        stack.setTag(tag);
+    }
+
+    private long getLastEquipped(ItemStack stack){
+        CompoundTag tag = getOrCreateTag(stack);
+        if(tag.contains("lastEquipped")){
+            return tag.getLong("lastEquipped");
+        }
+        return 0;
+    }
+
+    private CompoundTag getOrCreateTag(ItemStack stack){
+        CompoundTag tag;
+        if(stack.hasTag() && stack.getTag() != null){
+            tag = stack.getTag();
+        }else{
+            tag = new CompoundTag();
+        }
+        return tag;
+    }
+
+    /*
+    Tick storage
+     */
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -48,6 +81,21 @@ public class TimeBottleItem extends Item {
             if(entity instanceof PlayerEntity){
                 PlayerEntity player = (PlayerEntity) entity;
 
+                long time = world.getTime();
+                if(time % (20 * Config.secondsUntilUpdate) == 0){
+                    setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
+                    if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
+                    setLastEquipped(stack, time + (20 * Config.secondsUntilUpdate));
+                }
+
+                if(selected){
+                    String hud = "∞";
+                    if(!player.isCreative()) hud = TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack));
+                    player.sendMessage(new LiteralText(hud), true);
+                }
+
+
+                /*
                 boolean hasTimeBottle = false;
                 for(int i = 0; i < player.inventory.size(); i++){
                     if(player.inventory.getStack(i).getItem() == this){
@@ -55,8 +103,9 @@ public class TimeBottleItem extends Item {
                         break;
                     }
                 }
-
-                if(hasTimeBottle){
+                */
+                //if(hasTimeBottle){
+                /*
                     if(world.getTime() % 20 == 0){
 
                         long diff = world.getTime() - ((PlayerEntityAccess)player).getNTTTBottleLastEquipped();
@@ -75,11 +124,14 @@ public class TimeBottleItem extends Item {
                             player.sendMessage(new LiteralText(hud), true);
                         }
                     }
-                }
+                    */
+                //}
 
             }
         }
     }
+
+    /*
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
@@ -89,7 +141,7 @@ public class TimeBottleItem extends Item {
         BlockState state = world.getBlockState(pos);
 
         if(state.getBlock().hasRandomTicks(state) || state.getBlock().hasBlockEntity()){
-            if(player != null && (getStoredTicks(player) >= Config.baseDuration*20 || player.isCreative())){
+            if(player != null && (getStoredTicks(player) >= Config.baseDuration*20 || player.isCreative()){
                 if(!world.isClient){
 
                     // add said ticks to ticker
@@ -123,5 +175,22 @@ public class TimeBottleItem extends Item {
             }
         }
         return ActionResult.CONSUME;
+    }
+
+    */
+
+    /*
+    Client
+     */
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
+        if(world != null && stack != null){
+            tooltip.add(new LiteralText(
+                    "⌛ " + TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack))
+            ).formatted(Formatting.GRAY));
+        }
+        super.appendTooltip(stack, world, tooltip, context);
     }
 }
