@@ -1,24 +1,21 @@
 package red.jad.notimetotick;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import red.jad.notimetotick.objects.entities.TickerEntity;
 import red.jad.notimetotick.objects.items.TimeBottleItem;
 
-public class NTTT implements ModInitializer {
+public class TIAB implements ModInitializer {
 
-	public static final String MOD_ID = "notimetotick";
+	public static final String MOD_ID = "tiab";
 	public static Identifier id(String path){
-		return new Identifier(NTTT.MOD_ID, path);
+		return new Identifier(TIAB.MOD_ID, path);
 	}
 
 	public static final Item TIME_IN_A_BOTTLE = new TimeBottleItem();

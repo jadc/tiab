@@ -36,11 +36,12 @@ public class TickerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+            System.out.println(getLevel()/);
             BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
             BlockState state = world.getBlockState(target);
 
             // Duration
-            //if( this.age > (Config.baseDuration * 20) ) this.kill();
+            if( this.age > (Config.baseDuration * 20) ) this.kill();
 
             if(state.getOutlineShape(world, target) != null){
                 VoxelShape shape = state.getOutlineShape(world, target);

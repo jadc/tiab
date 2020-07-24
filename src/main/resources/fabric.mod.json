@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
-  "id": "notimetotick",
+  "id": "tiab",
   "version": "${version}",
 
-  "name": "NoTimeToTick",
-  "description": "A highly customizable tick acceleration mod.",
+  "name": "Time in a Bottle",
+  "description": "Bend the course of time to your will... in a bottle!",
   "authors": ["Jad Chehimi"],
   "contact": {
-    "homepage": "https://curseforge.com/jadc/notimetotick",
-    "sources": "https://github.com/jadc/notimetotick"
+    "homepage": "https://curseforge.com/jadc/tiab",
+    "sources": "https://github.com/jadc/tiab"
   },
 
   "license": "LGPLv3",
-  "icon": "assets/notimetotick/icon.png",
+  "icon": "assets/tiab/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "red.jad.notimetotick.NTTT"
+      "red.jad.tiab.NTTT"
     ],
     "client": [
-      "red.jad.notimetotick.client.NTTTClient"
+      "red.jad.tiab.client.NTTTClient"
     ]
   },
 
