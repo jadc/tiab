@@ -1,2 +1,2 @@
-# NoTimeToTick
-A highly customizable tick acceleration mod.
+# TIAB (Time in a Bottle)
+See branches.
