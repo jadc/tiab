@@ -8,10 +8,10 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import red.jad.notimetotick.NTTT;
+import red.jad.notimetotick.TIAB;
 
 public final class SpawnPacketHelper {
-    public static final Identifier SPAWN_PACKET = NTTT.id("spawn/nonliving/generic");
+    public static final Identifier SPAWN_PACKET = TIAB.id("spawn/nonliving/generic");
 
     private SpawnPacketHelper() {
     }

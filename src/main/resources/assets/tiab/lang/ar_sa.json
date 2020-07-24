@@ -1,0 +1,7 @@
+{
+  "item.notimetotick.time_in_a_bottle": "الوقت في زجاجة",
+  "tooltip.notimetotick.time_in_a_bottle": "\u231b %s",
+  "tooltip.notimetotick.time_in_a_bottle.delimiter": ":",
+  "tooltip.notimetotick.time_in_a_bottle.infinity": "\u221e",
+  "entity.notimetotick.ticker": "Ticker"
+}
