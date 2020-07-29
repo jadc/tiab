@@ -1,4 +1,4 @@
-package red.jad.notimetotick.client;
+package red.jad.tiab.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

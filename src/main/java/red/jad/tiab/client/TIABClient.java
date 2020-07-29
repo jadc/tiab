@@ -1,13 +1,13 @@
-package red.jad.notimetotick.client;
+package red.jad.tiab.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import red.jad.notimetotick.TIAB;
-import red.jad.notimetotick.backend.SpawnPacketHelper;
-import red.jad.notimetotick.objects.entities.render.TickerEntityRenderer;
+import red.jad.tiab.TIAB;
+import red.jad.tiab.backend.SpawnPacketHelper;
+import red.jad.tiab.objects.entities.render.TickerEntityRenderer;
 
 @Environment(EnvType.CLIENT)
 public class TIABClient implements ClientModInitializer {

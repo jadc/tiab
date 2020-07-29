@@ -6,24 +6,14 @@
     "LbL"
   ],
   "key": {
-    "g": {
-      "item": "minecraft:gold_ingot"
-    },
-    "D": {
-      "item": "minecraft:diamond"
-    },
-    "C": {
-      "item": "minecraft:clock"
-    },
-    "L": {
-      "item": "minecraft:lapis_lazuli"
-    },
-    "b": {
-      "item": "minecraft:glass_bottle"
-    }
+    "g": { "item": "minecraft:gold_ingot" },
+    "D": { "item": "minecraft:diamond" },
+    "C": { "item": "minecraft:clock" },
+    "L": { "item": "minecraft:lapis_lazuli" },
+    "b": { "item": "minecraft:glass_bottle" }
   },
   "result": {
-    "item": "notimetotick:time_in_a_bottle",
+    "item": "tiab:time_in_a_bottle",
     "count": 1
   }
 }
