@@ -36,7 +36,7 @@ public class TimeBottleItem extends Item {
 
     public TimeBottleItem() {
         super(new Item.Settings()
-                .group(ItemGroup.MISC)
+                .group(ItemGroup.TOOLS)
                 .maxCount(1)
                 .rarity(Rarity.RARE)
         );
@@ -133,7 +133,7 @@ public class TimeBottleItem extends Item {
                         TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
                         canAfford = true;
                     }else{
-                        if(tickers.get().getLevel() < 20){
+                        if(tickers.get().getLevel() < TIAB.config.gameplay.max_level && tickers.get().getLevel() < 20){
                             cost = (long)
                                     (TIAB.config.gameplay.acceleration_duration *
                                             (Math.pow(TIAB.config.gameplay.acceleration_base, tickers.get().getLevel()))
