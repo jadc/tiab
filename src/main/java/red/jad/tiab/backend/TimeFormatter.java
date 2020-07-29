@@ -1,4 +1,4 @@
-package red.jad.notimetotick.backend;
+package red.jad.tiab.backend;
 
 import net.minecraft.text.TranslatableText;
 
@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeFormatter {
     public static String ticksToTime(long ticks) {
-        String delimiter = new TranslatableText("tooltip.notimetotick.time_in_a_bottle.delimiter").getString();
+        String delimiter = new TranslatableText("tooltip.tiab.time_in_a_bottle.delimiter").getString();
 
         long seconds = ticks / 20;
         long hours = TimeUnit.SECONDS.toHours(seconds);

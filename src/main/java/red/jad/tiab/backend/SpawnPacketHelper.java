@@ -1,4 +1,4 @@
-package red.jad.notimetotick.backend;
+package red.jad.tiab.backend;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -8,7 +8,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import red.jad.notimetotick.TIAB;
+import red.jad.tiab.TIAB;
 
 public final class SpawnPacketHelper {
     public static final Identifier SPAWN_PACKET = TIAB.id("spawn/nonliving/generic");

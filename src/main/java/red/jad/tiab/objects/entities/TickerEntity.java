@@ -1,7 +1,6 @@
-package red.jad.notimetotick.objects.entities;
+package red.jad.tiab.objects.entities;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -10,20 +9,17 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import red.jad.notimetotick.backend.Config;
-import red.jad.notimetotick.backend.SpawnPacketHelper;
-
-import java.util.Random;
+import red.jad.tiab.TIAB;
+import red.jad.tiab.backend.SpawnPacketHelper;
 
 public class TickerEntity extends Entity {
 
@@ -36,39 +32,54 @@ public class TickerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-            System.out.println(getLevel()/);
-            BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
-            BlockState state = world.getBlockState(target);
+        // Anti-crash
+        if(getLevel() <= 0 || getLevel() > 20){
+            if(!this.world.isClient()) TIAB.LOG.warn("'{}' at [{}, {}, {}] had an invalid level of {} and was removed to avoid crashing the game; lower the configured max level below 20!", this.getDisplayName().getString(), this.getX(), this.getY(), this.getZ(), getLevel());
+            perish();
+        }
 
-            // Duration
-            if( this.age > (Config.baseDuration * 20) ) this.kill();
+        // Duration
+        //if(TIAB.config.gameplay.acceleration_duration == 0 || this.age > TIAB.config.gameplay.acceleration_duration) perish();
 
-            if(state.getOutlineShape(world, target) != null){
-                VoxelShape shape = state.getOutlineShape(world, target);
+        BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
+        BlockState state = world.getBlockState(target);
 
-                if(world.getTime() % (20/(getLevel()+1)) == 0){
-                    tickingEffect( target.getX(), target.getY(), target.getZ() );
-                    tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() );
-                    tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
-                    tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
+        if(TIAB.config.effects.effect_type == 1 && state.getOutlineShape(world, target) != null){
+            VoxelShape shape = state.getOutlineShape(world, target);
 
-                    tickingEffect( target.getX(), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                    tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                    tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                    tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
+            // TODO: clean this up
+            int rate = 20 - getLevel();
+            if(rate <= 1 || this.age % rate == 0){
+                tickingEffect( target.getX(), target.getY(), target.getZ() );
+                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() );
+                tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
+                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
 
+                tickingEffect( target.getX(), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
+                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
+                tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
+                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
+            }
+        }
+
+        if(!world.isClient()){
+            // If 'invalid' block, check config
+            if(TIAB.config.gameplay.cancel_if_invalid){
+                if((TIAB.config.gameplay.accelerate_block_entities && !state.getBlock().hasBlockEntity())
+                        && (TIAB.config.gameplay.accelerate_randomly && !state.getBlock().hasRandomTicks(state))) {
+                    perish();
                 }
             }
 
-        if(!world.isClient()){
-            int howManyTicksToTick = (int) Math.pow(Config.multiplier, (getLevel() + 1)) - 1;
+            int howManyTicksToTick = (int) Math.pow(TIAB.config.gameplay.acceleration_base, getLevel()) - 1; // - 1 cus block is ticking itself
             for(int i = 0; i < howManyTicksToTick; i++){
-                if(!state.getBlock().hasBlockEntity() && !state.getBlock().hasRandomTicks(state)) this.kill();
-
-                if(state.getBlock().hasRandomTicks(state)){
-                    if(this.world.getRandom().nextInt(1365) == 0) state.getBlock().randomTick(state, (ServerWorld) world, target, this.world.getRandom());
+                if(TIAB.config.gameplay.accelerate_randomly && state.getBlock().hasRandomTicks(state)){
+                    // random_acceleration_range lower = more likely to random tick
+                    if(this.world.getRandom().nextInt(TIAB.config.gameplay.random_acceleration_range) == 0){
+                        state.getBlock().randomTick(state, (ServerWorld) world, target, this.world.getRandom());
+                    }
                 }
-                if(state.getBlock().hasBlockEntity()) {
+                if(TIAB.config.gameplay.accelerate_block_entities && state.getBlock().hasBlockEntity()) {
                     BlockEntity tile = world.getBlockEntity(target);
                     if(tile != null && !tile.isRemoved() && tile instanceof Tickable){
                         ((Tickable) tile).tick();
@@ -82,19 +93,32 @@ public class TickerEntity extends Entity {
         world.addParticle(ParticleTypes.BUBBLE_POP, x, y, z, 0, 0, 0);
     }
 
+    public void perish(){
+        if(TIAB.config.effects.play_sounds){
+            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, TIAB.config.effects.volume, 0.1f);
+            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+        }
+        this.kill();
+    }
+
+    /*
+        Entity Data Handling
+     */
     public void setLevel(int level){
         if (!this.world.isClient) {
-            this.getDataTracker().set(LEVEL, Math.max(level, 0));
+            // This disgusting assortment of mins and maxxes basically does...
+            // 1 <-> level <-> (max_level, which is maxxed at 20)
+            this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), TIAB.config.gameplay.max_level), 1));
         }
     }
 
     public int getLevel(){
-        return (Integer)this.getDataTracker().get(LEVEL);
+        return (Integer) this.getDataTracker().get(LEVEL);
     }
 
     @Override
     protected void initDataTracker() {
-        this.getDataTracker().startTracking(LEVEL, 0);
+        this.getDataTracker().startTracking(LEVEL, 1);
     }
 
     @Override
@@ -109,6 +133,9 @@ public class TickerEntity extends Entity {
         tag.putInt("Level", this.getLevel());
     }
 
+    /*
+        Fabric, can you please fix entities not displaying to the client
+     */
     @Override
     public Packet<?> createSpawnPacket() {
         return SpawnPacketHelper.createNonLivingPacket(this);

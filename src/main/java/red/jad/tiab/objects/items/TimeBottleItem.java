@@ -1,4 +1,4 @@
-package red.jad.notimetotick.objects.items;
+package red.jad.tiab.objects.items;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,10 +25,9 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import red.jad.notimetotick.TIAB;
-import red.jad.notimetotick.backend.Config;
-import red.jad.notimetotick.backend.TimeFormatter;
-import red.jad.notimetotick.objects.entities.TickerEntity;
+import red.jad.tiab.TIAB;
+import red.jad.tiab.backend.TimeFormatter;
+import red.jad.tiab.objects.entities.TickerEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,12 +83,8 @@ public class TimeBottleItem extends Item {
         return tag;
     }
 
-    private MutableText displayTime(PlayerEntity player, World world, ItemStack stack){
-        return new TranslatableText("tooltip.notimetotick.time_in_a_bottle", player.isCreative() ? new TranslatableText("tooltip.notimetotick.time_in_a_bottle.infinity").getString() : TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack)));
-    }
-
-    private MutableText displayTime(World world, ItemStack stack){
-        return new TranslatableText("tooltip.notimetotick.time_in_a_bottle", TimeFormatter.ticksToTime( world.getTime() - getLastUsed(stack) ));
+    private MutableText displayTime(World world, ItemStack stack, boolean isInfinite){
+        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack)));
     }
 
     /*
@@ -103,46 +98,15 @@ public class TimeBottleItem extends Item {
             if(entity instanceof PlayerEntity){
                 PlayerEntity player = (PlayerEntity) entity;
 
+                if(selected) player.sendMessage(displayTime(world, stack, player.isCreative()), true);
+
                 // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
                 long time = world.getTime();
-                if(time % (20 * Config.secondsUntilUpdate) == 0){
+                if(TIAB.config.gameplay.update_frequency <= 0 || time % TIAB.config.gameplay.update_frequency == 0){
                     setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
                     if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
-                    setLastEquipped(stack, time + (20 * Config.secondsUntilUpdate));
+                    setLastEquipped(stack, time + TIAB.config.gameplay.update_frequency);
                 }
-
-                /*
-                boolean hasTimeBottle = false;
-                for(int i = 0; i < player.inventory.size(); i++){
-                    if(player.inventory.getStack(i).getItem() == this){
-                        hasTimeBottle = true;
-                        break;
-                    }
-                }
-                */
-                //if(hasTimeBottle){
-                /*
-                    if(world.getTime() % 20 == 0){
-
-                        long diff = world.getTime() - ((PlayerEntityAccess)player).getNTTTBottleLastEquipped();
-                        ((PlayerEntityAccess)player).setNTTTBottleLastUsed(((PlayerEntityAccess)player).getNTTTBottleLastUsed() + diff);
-
-                        // Initialize
-                        if(((PlayerEntityAccess)player).getNTTTBottleLastUsed() == 0){
-                            ((PlayerEntityAccess)player).setNTTTBottleLastUsed(world.getTime());
-                        }
-
-                        ((PlayerEntityAccess)player).setNTTTBottleLastEquipped(world.getTime() + 20);
-                        // HUD
-                        if(selected){
-                            String hud = "∞";
-                            if(!player.isCreative()) hud = TimeFormatter.ticksToTime(getStoredTicks(player));
-                            player.sendMessage(new LiteralText(hud), true);
-                        }
-                    }
-                    */
-                //}
-
             }
         }
     }
@@ -157,54 +121,68 @@ public class TimeBottleItem extends Item {
 
         if(state.getBlock().hasRandomTicks(state) || state.getBlock().hasBlockEntity()){
             long storedTicks = world.getTime() - getLastUsed(stack);
-            if(player != null && (storedTicks >= Config.baseDuration*20 || player.isCreative())){
+            if(player != null && (storedTicks >= TIAB.config.gameplay.acceleration_duration || player.isCreative())){
                 if(!world.isClient){
                     // add said ticks to ticker
                     Optional<TickerEntity> tickers = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
                     boolean canAfford = false;
-                    long cost = Config.baseDuration;
+                    long cost = TIAB.config.gameplay.acceleration_duration;
 
                     if(!tickers.isPresent()){
                         TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
                         canAfford = true;
                     }else{
-                        cost = (long) (Config.baseDuration * Math.pow(Config.multiplier, tickers.get().getLevel() + 1));
-                        if(storedTicks >= cost*20 || player.isCreative()){
-                            tickers.get().setLevel(tickers.get().getLevel() + 1);
-                            tickers.get().age = 0;
-                            canAfford = true;
+                        if(tickers.get().getLevel() < 20){
+                            cost = (long)
+                                    (TIAB.config.gameplay.acceleration_duration *
+                                            (Math.pow(TIAB.config.gameplay.acceleration_base, tickers.get().getLevel()))
+                                    );
+                            if(storedTicks >= cost || player.isCreative()){
+                                tickers.get().setLevel(tickers.get().getLevel() + 1);
+                                tickers.get().age = 0;
+                                canAfford = true;
+                            }
                         }
                     }
 
                     // remove ticks from player
                     if(canAfford){
-                        if(!player.isCreative()) setLastUsed(stack, getLastUsed(stack) + cost*20);
-                        player.sendMessage(displayTime(player, world, stack), true);
+                        if(!player.isCreative()) setLastUsed(stack, getLastUsed(stack) + cost);
 
-                        // sfx
-                        world.playSound(null, pos, SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, SoundCategory.BLOCKS, 1f, 1f);
+                        // fx
+                        if(TIAB.config.effects.play_sounds){
+                            world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.config.effects.volume, 1.5f);
+                            world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+                        }
+                    }else{
+                        if(TIAB.config.effects.play_sounds) world.playSound(null, pos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 0.5f);
                     }
                 }else{
                     player.swingHand(context.getHand());
                 }
             }
+
+            return ActionResult.success(context.getWorld().isClient);
+        }else{
+            return super.useOnBlock(context);
         }
-        return ActionResult.CONSUME;
     }
 
     /*
-    Client
+        Client
      */
-
     @Environment(EnvType.CLIENT)
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         if(world != null && stack != null){
-            // Time is only correctly displayed when in the player inventory.
-            // Workaround to avoid confusion for now
+            /*
+                Time is only correctly displayed when in the player inventory,
+                workaround to avoid confusion for now.
+                TODO (probably never): Not do this.
+             */
             if(MinecraftClient.getInstance().currentScreen instanceof InventoryScreen){
-                tooltip.add(displayTime(world, stack).formatted(Formatting.GRAY));
+                tooltip.add(displayTime(world, stack, false).formatted(Formatting.GRAY));
             }
         }
         super.appendTooltip(stack, world, tooltip, context);

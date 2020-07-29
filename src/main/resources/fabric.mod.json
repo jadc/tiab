@@ -4,11 +4,12 @@
   "version": "${version}",
 
   "name": "Time in a Bottle",
-  "description": "Bend the course of time to your will... in a bottle!",
+  "description": "Allows the storage of time within a bottle, allowing you to concentrate it into blocks.",
   "authors": ["Jad Chehimi"],
   "contact": {
     "homepage": "https://curseforge.com/jadc/tiab",
-    "sources": "https://github.com/jadc/tiab"
+    "sources": "https://github.com/jadc/tiab",
+    "issues": "https://github.com/jadc/tiab/issues"
   },
 
   "license": "LGPLv3",
@@ -16,12 +17,8 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "red.jad.tiab.NTTT"
-    ],
-    "client": [
-      "red.jad.tiab.client.NTTTClient"
-    ]
+    "main": [ "red.jad.tiab.TIAB" ],
+    "client": [ "red.jad.tiab.client.TIABClient" ]
   },
 
   "depends": {
