@@ -12,7 +12,7 @@ public class ConfigGameplay {
         update_frequency = 20;
         acceleration_duration = 30*20;
         acceleration_base = 2;
-        max_level = 10;
+        max_level = 5;
         random_acceleration_range = 1365;
 
         accelerate_block_entities = true;

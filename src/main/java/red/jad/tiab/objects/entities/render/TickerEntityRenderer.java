@@ -1,6 +1,7 @@
 package red.jad.tiab.objects.entities.render;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.render.ItemRenderContext;
+import net.fabricmc.loader.util.sat4j.core.Vec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FacingBlock;
@@ -21,7 +22,9 @@ import net.minecraft.datafixer.fix.ChunkPalettedStorageFix;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.graalvm.compiler.loop.InductionVariable;
 import red.jad.tiab.TIAB;
@@ -41,25 +44,39 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
 
     @Override
     public void render(TickerEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        final ItemStack stack = new ItemStack(Items.CLOCK);
         float time = entity.getEntityWorld().getTime() + tickDelta;
+        float lvl = entity.getLevel();
 
-        for(Direction d : Direction.values()){
-            if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
-                matrices.push();
-                //
-                matrices.translate(d.getOffsetX()/2f, (d.getOffsetY()/2f + 0.5), d.getOffsetZ()/2f);
+        if(!TIAB.config.effects.minimal){
+            for(Direction d : Direction.values()){
+                if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
+                    matrices.push();
+                    matrices.translate(d.getOffsetX()/1.94f, (d.getOffsetY()/1.94f + 0.5), d.getOffsetZ()/1.94f);
 
-                matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
-                Vector3f vec = NEGATIVE_Z;
-                if(d.getAxis().equals(Direction.Axis.X)) vec = POSITIVE_Z;
-                matrices.multiply(vec.getRadialQuaternion((time/20) * entity.getLevel()));
+                    matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
 
-                matrices.translate(0, -0.125, 0);
+                    float angle = (time/20) * lvl;
+                    if(d.getAxis().equals(Direction.Axis.X)){
+                        matrices.multiply(POSITIVE_Z.getRadialQuaternion(angle));
+                    }else{
+                        matrices.multiply(NEGATIVE_Z.getRadialQuaternion(angle));
+                    }
 
-                MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, 240, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
-                //
-                matrices.pop();
+                    matrices.translate(0, -0.125, 0);
+
+                    MinecraftClient.getInstance().getItemRenderer().renderItem(new ItemStack(TIAB.EFFECT_CLOCK_HAND), ModelTransformation.Mode.GROUND, 240, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+                    matrices.pop();
+
+                    matrices.push();
+                    matrices.translate(d.getOffsetX()/1.95f, (d.getOffsetY()/1.95f + 0.5), d.getOffsetZ()/1.95f);
+
+                    matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
+
+                    matrices.translate(0, -0.125, 0);
+
+                    MinecraftClient.getInstance().getItemRenderer().renderItem(new ItemStack(TIAB.EFFECT_CLOCK), ModelTransformation.Mode.GROUND, 240, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+                    matrices.pop();
+                }
             }
         }
     }
