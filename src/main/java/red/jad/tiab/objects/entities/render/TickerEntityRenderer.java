@@ -44,38 +44,36 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
 
     @Override
     public void render(TickerEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        final ItemStack stack = new ItemStack(Items.CLOCK);
         float time = entity.getEntityWorld().getTime() + tickDelta;
-        float lvl = entity.getLevel();
 
         if(!TIAB.config.effects.minimal){
             for(Direction d : Direction.values()){
                 if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
-                    matrices.push();
-                    matrices.translate(d.getOffsetX()/1.94f, (d.getOffsetY()/1.94f + 0.5), d.getOffsetZ()/1.94f);
+                    // don't render if inside block
+                    BlockPos side = entity.getBlockPos().add(d.getOffsetX(), d.getOffsetY(), d.getOffsetZ());
+                    if(entity.getEntityWorld().getBlockState(side).isTranslucent(entity.getEntityWorld(), side)){
+                        matrices.push();
 
-                    matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
+                        // center in block
+                        matrices.translate(d.getOffsetX()/1.95f, (d.getOffsetY()/1.95f + 0.5), d.getOffsetZ()/1.95f);
 
-                    float angle = (time/20) * lvl;
-                    if(d.getAxis().equals(Direction.Axis.X)){
-                        matrices.multiply(POSITIVE_Z.getRadialQuaternion(angle));
-                    }else{
-                        matrices.multiply(NEGATIVE_Z.getRadialQuaternion(angle));
+                        // align to block sides
+                        matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
+
+                        // spin clock
+                        Vector3f vec = NEGATIVE_Z;
+                        if(d.getAxis().equals(Direction.Axis.X)) vec = POSITIVE_Z;
+                        matrices.multiply(vec.getRadialQuaternion((time / 20) * entity.getLevel()));
+
+                        // rotate from center
+                        matrices.translate(0, -0.125, 0);
+
+                        // render item
+                        MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, 240 + (10 - TIAB.config.effects.opacity), OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+                        matrices.pop();
                     }
 
-                    matrices.translate(0, -0.125, 0);
-
-                    MinecraftClient.getInstance().getItemRenderer().renderItem(new ItemStack(TIAB.EFFECT_CLOCK_HAND), ModelTransformation.Mode.GROUND, 240, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
-                    matrices.pop();
-
-                    matrices.push();
-                    matrices.translate(d.getOffsetX()/1.95f, (d.getOffsetY()/1.95f + 0.5), d.getOffsetZ()/1.95f);
-
-                    matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(d.asRotation()));
-
-                    matrices.translate(0, -0.125, 0);
-
-                    MinecraftClient.getInstance().getItemRenderer().renderItem(new ItemStack(TIAB.EFFECT_CLOCK), ModelTransformation.Mode.GROUND, 240, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
-                    matrices.pop();
                 }
             }
         }
