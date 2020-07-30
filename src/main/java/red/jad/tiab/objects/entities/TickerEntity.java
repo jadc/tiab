@@ -44,8 +44,7 @@ public class TickerEntity extends Entity {
         BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
         BlockState state = world.getBlockState(target);
 
-        /*
-        if(state.getOutlineShape(world, target) != null){
+        if(TIAB.config.effects.minimal && state.getOutlineShape(world, target) != null){
             VoxelShape shape = state.getOutlineShape(world, target);
 
             // TODO: clean this up
@@ -62,7 +61,6 @@ public class TickerEntity extends Entity {
                 tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
             }
         }
-         */
 
         if(!world.isClient()){
             // If 'invalid' block, check config

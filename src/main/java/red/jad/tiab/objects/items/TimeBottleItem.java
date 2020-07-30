@@ -119,54 +119,47 @@ public class TimeBottleItem extends Item {
         ItemStack stack = context.getStack();
         BlockState state = world.getBlockState(pos);
 
-        if(state.getBlock().hasRandomTicks(state) || state.getBlock().hasBlockEntity()){
-            long storedTicks = world.getTime() - getLastUsed(stack);
-            if(player != null && (storedTicks >= TIAB.config.gameplay.acceleration_duration || player.isCreative())){
-                if(!world.isClient){
-                    // add said ticks to ticker
-                    Optional<TickerEntity> tickers = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
+        if((TIAB.config.gameplay.accelerate_randomly && state.getBlock().hasRandomTicks(state))
+                || (TIAB.config.gameplay.accelerate_block_entities && state.getBlock().hasBlockEntity())){
 
-                    boolean canAfford = false;
-                    long cost = TIAB.config.gameplay.acceleration_duration;
+            if(player == null) return super.useOnBlock(context);
 
-                    if(!tickers.isPresent()){
-                        TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
-                        canAfford = true;
-                    }else{
-                        if(tickers.get().getLevel() < TIAB.config.gameplay.max_level && tickers.get().getLevel() < 20){
-                            cost = (long)
-                                    (TIAB.config.gameplay.acceleration_duration *
-                                            (Math.pow(TIAB.config.gameplay.acceleration_base, tickers.get().getLevel()))
-                                    );
-                            if(storedTicks >= cost || player.isCreative()){
-                                tickers.get().setLevel(tickers.get().getLevel() + 1);
-                                tickers.get().age = 0;
-                                canAfford = true;
-                            }
-                        }
-                    }
+            if(!world.isClient()){
+                boolean valid = false;
+                double baseCost = player.isCreative() ? 0 : TIAB.config.gameplay.acceleration_duration;
+                double cost = baseCost;
+                long storedTicks = world.getTime() - getLastUsed(stack);
 
-                    // remove ticks from player
-                    if(canAfford){
-                        if(!player.isCreative()) setLastUsed(stack, getLastUsed(stack) + cost);
+                Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
-                        // fx
-                        if(TIAB.config.effects.play_sounds){
-                            world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.config.effects.volume, 1.5f);
-                            world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
-                        }
-                    }else{
-                        if(TIAB.config.effects.play_sounds) world.playSound(null, pos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 0.5f);
-                    }
+                if(!tickersInBlock.isPresent()){
+                    TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
+                    valid = true;
                 }else{
-                    player.swingHand(context.getHand());
+                    TickerEntity ticker = tickersInBlock.get();
+                    if(ticker.getLevel() < TIAB.config.gameplay.max_level) {
+                        cost = baseCost * Math.pow(TIAB.config.gameplay.acceleration_base, ticker.getLevel());
+                        if (storedTicks >= cost) {
+                            ticker.setLevel(ticker.getLevel() + 1);
+                            ticker.age = 0;
+                            valid = true;
+                        }
+                    }
+                }
+
+                if(valid){
+                    setLastUsed(stack, getLastUsed(stack) + (long)cost);
+                    if(TIAB.config.effects.play_sounds){
+                        world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.config.effects.volume, 1.5f);
+                        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+                    }
+
+                    return ActionResult.SUCCESS;
                 }
             }
-
-            return ActionResult.success(context.getWorld().isClient);
-        }else{
-            return super.useOnBlock(context);
         }
+
+        return super.useOnBlock(context);
     }
 
     /*

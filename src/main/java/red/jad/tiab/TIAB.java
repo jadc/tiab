@@ -25,8 +25,6 @@ public class TIAB implements ModInitializer {
 	public static Config config;
 
 	public static final Item TIME_IN_A_BOTTLE = new TimeBottleItem();
-	public static final Item EFFECT_CLOCK = new Item(new Item.Settings());
-	public static final Item EFFECT_CLOCK_HAND = new Item(new Item.Settings());
 
 	public static final EntityType<TickerEntity> TICKER = Registry.register(
 		Registry.ENTITY_TYPE,
@@ -36,8 +34,6 @@ public class TIAB implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, id("time_in_a_bottle"), TIME_IN_A_BOTTLE);
-		Registry.register(Registry.ITEM, id("effect_clock"), EFFECT_CLOCK);
-		Registry.register(Registry.ITEM, id("effect_clock_hand"), EFFECT_CLOCK_HAND);
 
 		// Initialize and read config
 		config = new Config(TIAB.MOD_ID + ".json");
