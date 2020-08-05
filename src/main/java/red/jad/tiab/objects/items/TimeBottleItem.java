@@ -16,6 +16,7 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -84,7 +85,7 @@ public class TimeBottleItem extends Item {
     }
 
     private MutableText displayTime(World world, ItemStack stack, boolean isInfinite){
-        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack)));
+        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : new LiteralText(TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack))));
     }
 
     /*
@@ -94,15 +95,31 @@ public class TimeBottleItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
 
-        if(!world.isClient){
-            if(entity instanceof PlayerEntity){
-                PlayerEntity player = (PlayerEntity) entity;
+        if(entity instanceof PlayerEntity){
+            PlayerEntity player = (PlayerEntity) entity;
+            long time = world.getTime();
+            if(world.isClient){
+                if(TIAB.config.effects.hud && selected){
+                    if(TIAB.config.gameplay.update_frequency <= 1 || time % TIAB.config.gameplay.update_frequency == 0){
+                        player.sendMessage(displayTime(world, stack, player.isCreative()), true);
+                    }
+                }
+            }else{
+                if(TIAB.config.gameplay.update_frequency <= 1 || time % TIAB.config.gameplay.update_frequency == 0){
+                    // Only allow largest bottle to accumulate time
+                    if(TIAB.config.gameplay.one_bottle_at_a_time){
+                        for(int i = 0; i < player.inventory.size(); i++){
+                            ItemStack other = player.inventory.getStack(i);
+                            if(other.getItem() == this && other != stack){
+                                // if other has less stored ticks
+                                if(getLastUsed(other) > getLastUsed(stack)){
+                                    setLastUsed(other, getLastUsed(other) + TIAB.config.gameplay.update_frequency);
+                                }
+                            }
+                        }
+                    }
 
-                if(selected) player.sendMessage(displayTime(world, stack, player.isCreative()), true);
-
-                // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
-                long time = world.getTime();
-                if(TIAB.config.gameplay.update_frequency <= 0 || time % TIAB.config.gameplay.update_frequency == 0){
+                    // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
                     setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
                     if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
                     setLastEquipped(stack, time + TIAB.config.gameplay.update_frequency);
@@ -119,42 +136,41 @@ public class TimeBottleItem extends Item {
         ItemStack stack = context.getStack();
         BlockState state = world.getBlockState(pos);
 
-        if((TIAB.config.gameplay.accelerate_randomly && state.getBlock().hasRandomTicks(state))
-                || (TIAB.config.gameplay.accelerate_block_entities && state.getBlock().hasBlockEntity())){
+        if(player != null){
+            if((TIAB.config.gameplay.accelerate_randomly && state.getBlock().hasRandomTicks(state))
+                    || (TIAB.config.gameplay.accelerate_block_entities && state.getBlock().hasBlockEntity())){
 
-            if(player == null) return super.useOnBlock(context);
+                if(!world.isClient()){
+                    boolean valid = false;
+                    double baseCost = player.isCreative() ? 0 : TIAB.config.gameplay.acceleration_duration;
+                    double cost = baseCost;
+                    long storedTicks = world.getTime() - getLastUsed(stack);
 
-            if(!world.isClient()){
-                boolean valid = false;
-                double baseCost = player.isCreative() ? 0 : TIAB.config.gameplay.acceleration_duration;
-                double cost = baseCost;
-                long storedTicks = world.getTime() - getLastUsed(stack);
+                    Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
-                Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
-
-                if(!tickersInBlock.isPresent()){
-                    TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
-                    valid = true;
-                }else{
-                    TickerEntity ticker = tickersInBlock.get();
-                    if(ticker.getLevel() < TIAB.config.gameplay.max_level) {
-                        cost = baseCost * Math.pow(TIAB.config.gameplay.acceleration_base, ticker.getLevel());
-                        if (storedTicks >= cost) {
-                            ticker.setLevel(ticker.getLevel() + 1);
-                            ticker.age = 0;
-                            valid = true;
+                    if(!tickersInBlock.isPresent()){
+                        TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
+                        valid = true;
+                    }else{
+                        TickerEntity ticker = tickersInBlock.get();
+                        if(ticker.getLevel() < TIAB.config.gameplay.max_level) {
+                            cost = baseCost * Math.pow(TIAB.config.gameplay.acceleration_base, ticker.getLevel());
+                            if (storedTicks >= cost) {
+                                ticker.setLevel(ticker.getLevel() + 1);
+                                ticker.age = 0;
+                                valid = true;
+                            }
                         }
                     }
-                }
 
-                if(valid){
-                    setLastUsed(stack, getLastUsed(stack) + (long)cost);
-                    if(TIAB.config.effects.play_sounds){
-                        world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.config.effects.volume, 1.5f);
-                        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+                    if(valid){
+                        setLastUsed(stack, getLastUsed(stack) + (long)cost);
+                        if(TIAB.config.effects.play_sounds){
+                            world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.config.effects.volume, 1.5f);
+                            world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+                        }
+                        return ActionResult.SUCCESS;
                     }
-
-                    return ActionResult.SUCCESS;
                 }
             }
         }

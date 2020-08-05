@@ -47,7 +47,7 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
         final ItemStack stack = new ItemStack(Items.CLOCK);
         float time = entity.getEntityWorld().getTime() + tickDelta;
 
-        if(!TIAB.config.effects.minimal){
+        if(TIAB.config.effects.rotating_clock){
             for(Direction d : Direction.values()){
                 if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
                     // don't render if inside block

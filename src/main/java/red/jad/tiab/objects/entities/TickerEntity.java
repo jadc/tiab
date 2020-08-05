@@ -21,6 +21,8 @@ import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.SpawnPacketHelper;
 
+import java.util.Random;
+
 public class TickerEntity extends Entity {
 
     private static final TrackedData<Integer> LEVEL = DataTracker.registerData(TickerEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -39,26 +41,30 @@ public class TickerEntity extends Entity {
         }
 
         // Duration
-        //if(TIAB.config.gameplay.acceleration_duration == 0 || this.age > TIAB.config.gameplay.acceleration_duration) perish();
+        if(TIAB.config.gameplay.acceleration_duration == 0 || this.age > TIAB.config.gameplay.acceleration_duration) perish();
 
         BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
         BlockState state = world.getBlockState(target);
 
-        if(TIAB.config.effects.minimal && state.getOutlineShape(world, target) != null){
+        if(TIAB.config.effects.particles && state.getOutlineShape(world, target) != null){
             VoxelShape shape = state.getOutlineShape(world, target);
 
-            // TODO: clean this up
-            int rate = 20 - getLevel();
+            int rate = (TIAB.config.gameplay.max_level * 4) / getLevel();
             if(rate <= 1 || this.age % rate == 0){
-                tickingEffect( target.getX(), target.getY(), target.getZ() );
-                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() );
-                tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
-                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() );
+                for(int x = 0; x <= 1; x++){
+                    for(int z = 0; z <= 1; z++){
+                        for(int y = 0; y <= 1; y++){
+                            world.addParticle(
+                                    ParticleTypes.BUBBLE_POP,
+                                    target.getX() + (x == 0 ? x : shape.getMax(Direction.Axis.X)),
+                                    target.getY() + (y == 0 ? y : shape.getMax(Direction.Axis.Y)),
+                                    target.getZ() + (z == 0 ? z : shape.getMax(Direction.Axis.Z)),
+                                    0, 0, 0
+                            );
+                        }
+                    }
+                }
 
-                tickingEffect( target.getX(), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY(), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                tickingEffect( target.getX(), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
-                tickingEffect( target.getX() + shape.getMax(Direction.Axis.X), target.getY() + shape.getMax(Direction.Axis.Y), target.getZ() + shape.getMax(Direction.Axis.Z) );
             }
         }
 
@@ -89,10 +95,6 @@ public class TickerEntity extends Entity {
         }
     }
 
-    public void tickingEffect(double x, double y, double z){
-        world.addParticle(ParticleTypes.BUBBLE_POP, x, y, z, 0, 0, 0);
-    }
-
     public void perish(){
         if(TIAB.config.effects.play_sounds){
             world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, TIAB.config.effects.volume, 0.1f);
@@ -107,7 +109,7 @@ public class TickerEntity extends Entity {
     public void setLevel(int level){
         if (!this.world.isClient) {
             // This disgusting assortment of mins and maxxes basically does...
-            // 1 <-> level <-> (max_level, which is maxxed at 20)
+            // 1 <-> level <-> (max_level, which itself is maxxed at 20)
             this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), TIAB.config.gameplay.max_level), 1));
         }
     }
