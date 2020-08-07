@@ -13,8 +13,8 @@ public class ConfigEffects {
     public ConfigEffects(){
         play_sounds = true;
         rotating_clock = true;
-        particles = true;
-        volume = 0.25f;
+        particles = false;
+        volume = 0.5f;
         opacity = 8;
         hud = true;
     }

@@ -14,6 +14,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
@@ -149,7 +150,7 @@ public class TimeBottleItem extends Item {
                     Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
                     if(!tickersInBlock.isPresent()){
-                        TIAB.TICKER.spawn(world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
+                        TIAB.TICKER.spawn((ServerWorld) world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
                         valid = true;
                     }else{
                         TickerEntity ticker = tickersInBlock.get();
