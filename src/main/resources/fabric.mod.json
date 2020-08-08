@@ -20,6 +20,9 @@
     "main": [ "red.jad.tiab.TIAB" ],
     "client": [ "red.jad.tiab.client.TIABClient" ]
   },
+  "mixins": [
+    "tiab.mixins.json"
+  ],
 
   "depends": {
     "fabricloader": ">=0.7.4",
