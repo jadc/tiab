@@ -8,14 +8,14 @@ public class ConfigEffects {
     @Expose
     public float volume;
     @Expose
-    public int opacity;
+    public int rotating_clock_opacity;
 
     public ConfigEffects(){
         play_sounds = true;
+        volume = 0.5f;
         rotating_clock = true;
         particles = false;
-        volume = 0.5f;
-        opacity = 8;
+        rotating_clock_opacity = 8;
         hud = true;
     }
 }

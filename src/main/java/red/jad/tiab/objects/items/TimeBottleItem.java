@@ -17,10 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
@@ -28,7 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
-import red.jad.tiab.backend.TimeFormatter;
+import red.jad.tiab.client.TimeTooltip;
 import red.jad.tiab.objects.entities.TickerEntity;
 
 import java.util.List;
@@ -53,7 +50,7 @@ public class TimeBottleItem extends Item {
         stack.setTag(tag);
     }
 
-    private long getLastUsed(ItemStack stack){
+    public static long getLastUsed(ItemStack stack){
         CompoundTag tag = getOrCreateTag(stack);
         if(tag.contains("lastUsed")){
             return tag.getLong("lastUsed");
@@ -75,7 +72,7 @@ public class TimeBottleItem extends Item {
         return 0;
     }
 
-    private CompoundTag getOrCreateTag(ItemStack stack){
+    private static CompoundTag getOrCreateTag(ItemStack stack){
         CompoundTag tag;
         if(stack.hasTag() && stack.getTag() != null){
             tag = stack.getTag();
@@ -83,10 +80,6 @@ public class TimeBottleItem extends Item {
             tag = new CompoundTag();
         }
         return tag;
-    }
-
-    private MutableText displayTime(World world, ItemStack stack, boolean isInfinite){
-        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : new LiteralText(TimeFormatter.ticksToTime(world.getTime() - getLastUsed(stack))));
     }
 
     /*
@@ -102,7 +95,7 @@ public class TimeBottleItem extends Item {
             if(world.isClient){
                 if(TIAB.config.effects.hud && selected){
                     if(TIAB.config.gameplay.update_frequency <= 1 || time % TIAB.config.gameplay.update_frequency == 0){
-                        player.sendMessage(displayTime(world, stack, player.isCreative()), true);
+                        //player.sendMessage(TimeTooltip.getText(world, stack, player.isCreative()), true);
                     }
                 }
             }else{
@@ -192,7 +185,7 @@ public class TimeBottleItem extends Item {
                 TODO (probably never): Not do this.
              */
             if(MinecraftClient.getInstance().currentScreen instanceof InventoryScreen){
-                tooltip.add(displayTime(world, stack, false).formatted(Formatting.GRAY));
+                tooltip.add(TimeTooltip.getText(world, stack, false).formatted(Formatting.GRAY));
             }
         }
         super.appendTooltip(stack, world, tooltip, context);
