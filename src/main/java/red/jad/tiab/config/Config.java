@@ -9,67 +9,67 @@ import red.jad.tiab.TIAB;
 public class Config implements ConfigData {
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-    Client client = new Client();
+    public Client client = new Client();
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
-    Gameplay gameplay = new Gameplay();
-    private static class Client implements ConfigData {
+    public Gameplay gameplay = new Gameplay();
+    public static class Client implements ConfigData {
 
-        enum effectType { CLOCK, PARTICLES, BOTH }
+        public enum effectType { CLOCK, PARTICLES, BOTH }
 
         @ConfigEntry.Gui.Tooltip(count = 3)
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-        private effectType effect_type = effectType.CLOCK;
+        public effectType effect_type = effectType.CLOCK;
 
         @ConfigEntry.BoundedDiscrete(min = 0, max = 100)
-        private int volume = 50;
+        public int volume = 50;
 
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-        HUDConfig hud = new HUDConfig();
+        public HUDConfig hud = new HUDConfig();
 
-        private static class HUDConfig implements ConfigData {
-            enum displayWhen { HOVER, ALWAYS, NEVER }
+        public static class HUDConfig implements ConfigData {
+            public enum displayWhen { HOVER, ALWAYS, NEVER }
 
             @ConfigEntry.Gui.Tooltip(count = 3)
             @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-            private displayWhen display_when = displayWhen.HOVER;
+            public displayWhen display_when = displayWhen.HOVER;
 
             @ConfigEntry.Gui.Tooltip
-            private int vertical_offset = -16;
+            public int vertical_offset = -16;
 
             @ConfigEntry.ColorPicker
-            private int color = 0xffffff;
+            public int color = 0xffffff;
         }
     }
 
 
-    private static class Gameplay implements ConfigData {
+    public static class Gameplay implements ConfigData {
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private boolean accelerate_block_entities = true;
+        public boolean accelerate_block_entities = true;
 
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private boolean accelerate_randomly = true;
+        public boolean accelerate_randomly = true;
 
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private boolean cancel_if_invalid = true;
+        public boolean cancel_if_invalid = true;
 
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private boolean one_bottle_at_a_time = true;
+        public boolean one_bottle_at_a_time = true;
 
         @ConfigEntry.Gui.Tooltip
-        private int update_frequency = 20;
+        public int update_frequency = 20;
 
         @ConfigEntry.Gui.Tooltip
-        private int acceleration_duration = 30*20;
+        public int acceleration_duration = 30*20;
 
         @ConfigEntry.Gui.Tooltip
-        private int acceleration_base = 2;
+        public int acceleration_base = 2;
 
         @ConfigEntry.Gui.Tooltip
         @ConfigEntry.BoundedDiscrete(min = 1, max = 19)
-        private int max_level = 5;
+        public int max_level = 5;
 
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private int random_acceleration_range = 1365;
+        public int random_acceleration_range = 1365;
     }
 }

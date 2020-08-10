@@ -10,7 +10,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import red.jad.tiab.TIAB;
 import red.jad.tiab.client.TimeTooltip;
+import red.jad.tiab.config.Config;
 
 @Mixin(InGameHud.class)
 public class TIABHudMixin {
@@ -19,6 +21,6 @@ public class TIABHudMixin {
 
     @Inject(at = @At("HEAD"), method = "render")
     public void renderTIABTooltip(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        TimeTooltip.render(matrices, this.scaledWidth, this.scaledHeight);
+        if(TIAB.config.client.hud.display_when != Config.Client.HUDConfig.displayWhen.NEVER) TimeTooltip.render(matrices, this.scaledWidth, this.scaledHeight);
     }
 }

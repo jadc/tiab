@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.backend.TimeFormatter;
+import red.jad.tiab.config.Config;
 import red.jad.tiab.objects.items.TimeBottleItem;
 
 public class TimeTooltip {
@@ -32,7 +33,7 @@ public class TimeTooltip {
                     BlockHitResult blockHit = (BlockHitResult) client.crosshairTarget;
                     BlockState target = client.world.getBlockState(blockHit.getBlockPos());
 
-                    if(Helpers.isAcceleratable(target)){
+                    if(TIAB.config.client.hud.display_when == Config.Client.HUDConfig.displayWhen.ALWAYS || Helpers.isAcceleratable(target)){
                         client.getProfiler().push(new Identifier(TIAB.MOD_ID, "time_tooltip").toString());
 
                         MutableText text = getText(client.world, client.player.getActiveItem(), client.player.isCreative());
@@ -41,7 +42,7 @@ public class TimeTooltip {
                         float centeredX = (screenWidth - textWidth) / 2f;
                         float centeredY = screenHeight / 2f - 4;
 
-                        client.inGameHud.getFontRenderer().drawWithShadow(matrices, text.getString(), centeredX, centeredY + 16, Integer.parseInt("ffffff", 16), false);
+                        client.inGameHud.getFontRenderer().drawWithShadow(matrices, text.getString(), centeredX, centeredY - TIAB.config.client.hud.vertical_offset, TIAB.config.client.hud.color, false);
 
                         client.getProfiler().pop();
                     }
