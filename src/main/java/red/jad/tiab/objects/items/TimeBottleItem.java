@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.client.TimeTooltip;
+import red.jad.tiab.config.Config;
 import red.jad.tiab.objects.entities.TickerEntity;
 
 import java.util.List;
@@ -93,22 +94,16 @@ public class TimeBottleItem extends Item {
         if(entity instanceof PlayerEntity){
             PlayerEntity player = (PlayerEntity) entity;
             long time = world.getTime();
-            if(world.isClient){
-                if(TIAB.oldConfig.effects.hud && selected){
-                    if(TIAB.oldConfig.gameplay.update_frequency <= 1 || time % TIAB.oldConfig.gameplay.update_frequency == 0){
-                        //player.sendMessage(TimeTooltip.getText(world, stack, player.isCreative()), true);
-                    }
-                }
-            }else{
-                if(TIAB.oldConfig.gameplay.update_frequency <= 1 || time % TIAB.oldConfig.gameplay.update_frequency == 0){
+            if(!world.isClient){
+                if(TIAB.config.gameplay.update_frequency <= 1 || time % TIAB.config.gameplay.update_frequency == 0){
                     // Only allow largest bottle to accumulate time
-                    if(TIAB.oldConfig.gameplay.one_bottle_at_a_time){
+                    if(TIAB.config.gameplay.one_bottle_at_a_time){
                         for(int i = 0; i < player.inventory.size(); i++){
                             ItemStack other = player.inventory.getStack(i);
                             if(other.getItem() == this && other != stack){
                                 // if other has less stored ticks
                                 if(getLastUsed(other) > getLastUsed(stack)){
-                                    setLastUsed(other, getLastUsed(other) + TIAB.oldConfig.gameplay.update_frequency);
+                                    setLastUsed(other, getLastUsed(other) + TIAB.config.gameplay.update_frequency);
                                 }
                             }
                         }
@@ -117,7 +112,7 @@ public class TimeBottleItem extends Item {
                     // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
                     setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
                     if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
-                    setLastEquipped(stack, time + TIAB.oldConfig.gameplay.update_frequency);
+                    setLastEquipped(stack, time + TIAB.config.gameplay.update_frequency);
                 }
             }
         }
@@ -136,7 +131,7 @@ public class TimeBottleItem extends Item {
 
                 if(!world.isClient()){
                     boolean valid = false;
-                    double baseCost = player.isCreative() ? 0 : TIAB.oldConfig.gameplay.acceleration_duration;
+                    double baseCost = player.isCreative() ? 0 : TIAB.config.gameplay.acceleration_duration;
                     double cost = baseCost;
                     long storedTicks = world.getTime() - getLastUsed(stack);
 
@@ -147,8 +142,8 @@ public class TimeBottleItem extends Item {
                         valid = true;
                     }else{
                         TickerEntity ticker = tickersInBlock.get();
-                        if(ticker.getLevel() < TIAB.oldConfig.gameplay.max_level) {
-                            cost = baseCost * Math.pow(TIAB.oldConfig.gameplay.acceleration_base, ticker.getLevel());
+                        if(ticker.getLevel() < TIAB.config.gameplay.max_level) {
+                            cost = baseCost * Math.pow(TIAB.config.gameplay.acceleration_base, ticker.getLevel());
                             if (storedTicks >= cost) {
                                 ticker.setLevel(ticker.getLevel() + 1);
                                 ticker.age = 0;
@@ -159,9 +154,12 @@ public class TimeBottleItem extends Item {
 
                     if(valid){
                         setLastUsed(stack, getLastUsed(stack) + (long)cost);
-                        if(TIAB.oldConfig.effects.play_sounds){
-                            world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume, 1.5f);
-                            world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume / 2, 1.5f);
+                        if(TIAB.config.client.volume > 0){
+                            Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
+                            Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE);
+
+                            //world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume, 1.5f);
+                            //world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume / 2, 1.5f);
                         }
                         return ActionResult.SUCCESS;
                     }

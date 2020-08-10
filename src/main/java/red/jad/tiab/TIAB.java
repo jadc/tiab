@@ -16,7 +16,6 @@ import red.jad.tiab.objects.entities.TickerEntity;
 import red.jad.tiab.objects.items.TimeBottleItem;
 
 import org.apache.logging.log4j.LogManager;
-import red.jad.tiab.old_config.OldConfig;
 
 public class TIAB implements ModInitializer {
 
@@ -25,7 +24,6 @@ public class TIAB implements ModInitializer {
 	public static Identifier id(String path){
 		return new Identifier(TIAB.MOD_ID, path);
 	}
-	public static OldConfig oldConfig;
 	public static Config config;
 
 	public static final Item TIME_IN_A_BOTTLE = new TimeBottleItem();
@@ -41,13 +39,5 @@ public class TIAB implements ModInitializer {
 
 		AutoConfig.register(Config.class, GsonConfigSerializer::new);
 		config = AutoConfig.getConfigHolder(Config.class).getConfig();
-
-		// Initialize and read config
-		oldConfig = new OldConfig(TIAB.MOD_ID + ".old.json");
-		try {
-			oldConfig.read();
-		} catch (Throwable err) {
-			err.printStackTrace();
-		}
 	}
 }
