@@ -34,7 +34,7 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
         final ItemStack stack = new ItemStack(Items.CLOCK);
         float time = entity.getEntityWorld().getTime() + tickDelta;
 
-        if(TIAB.config.effects.rotating_clock){
+        if(TIAB.oldConfig.effects.rotating_clock){
             for(Direction d : Direction.values()){
                 if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
                     // don't render if inside block
@@ -57,7 +57,7 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
                         matrices.translate(0, -0.125, 0);
 
                         // render item
-                        MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, 240 + (10 - TIAB.config.effects.rotating_clock_opacity), OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+                        MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, 240 + (10 - TIAB.oldConfig.effects.rotating_clock_opacity), OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
                         matrices.pop();
                     }
 

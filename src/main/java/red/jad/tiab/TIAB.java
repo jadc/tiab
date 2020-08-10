@@ -1,5 +1,7 @@
 package red.jad.tiab;
 
+import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
+import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
@@ -14,6 +16,7 @@ import red.jad.tiab.objects.entities.TickerEntity;
 import red.jad.tiab.objects.items.TimeBottleItem;
 
 import org.apache.logging.log4j.LogManager;
+import red.jad.tiab.old_config.OldConfig;
 
 public class TIAB implements ModInitializer {
 
@@ -22,6 +25,7 @@ public class TIAB implements ModInitializer {
 	public static Identifier id(String path){
 		return new Identifier(TIAB.MOD_ID, path);
 	}
+	public static OldConfig oldConfig;
 	public static Config config;
 
 	public static final Item TIME_IN_A_BOTTLE = new TimeBottleItem();
@@ -35,10 +39,13 @@ public class TIAB implements ModInitializer {
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, id("time_in_a_bottle"), TIME_IN_A_BOTTLE);
 
+		AutoConfig.register(Config.class, GsonConfigSerializer::new);
+		config = AutoConfig.getConfigHolder(Config.class).getConfig();
+
 		// Initialize and read config
-		config = new Config(TIAB.MOD_ID + ".json");
+		oldConfig = new OldConfig(TIAB.MOD_ID + ".old.json");
 		try {
-			config.read();
+			oldConfig.read();
 		} catch (Throwable err) {
 			err.printStackTrace();
 		}

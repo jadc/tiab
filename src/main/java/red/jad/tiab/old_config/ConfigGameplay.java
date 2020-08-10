@@ -1,4 +1,4 @@
-package red.jad.tiab.config;
+package red.jad.tiab.old_config;
 
 import com.google.gson.annotations.Expose;
 
