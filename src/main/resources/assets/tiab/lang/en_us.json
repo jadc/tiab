@@ -2,5 +2,60 @@
   "item.tiab.time_in_a_bottle": "Time in a Bottle",
   "tooltip.tiab.time_in_a_bottle": "\u231b %s",
   "tooltip.tiab.time_in_a_bottle.delimiter": ":",
-  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e"
+  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e",
+
+  "text.autoconfig.tiab.title": "Time in a Bottle Configuration",
+  "text.autoconfig.tiab.option.client": "Client",
+
+  "text.autoconfig.tiab.option.client.effect_type": "Effect Type",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[0]": "CLOCK: Rotating clock on all sides of the block",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[1]": "PARTICLES: Flashing particles on every corner of the block",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[2]": "BOTH: Both effects at the same time",
+
+  "text.autoconfig.tiab.option.client.volume": "Volume (%)",
+  "text.autoconfig.tiab.option.client.hud": "HUD",
+
+  "text.autoconfig.tiab.option.client.hud.display_when": "Display when...",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[0]": "HOVER: Display when hovering over a valid block",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[1]": "ALWAYS: Display when holding the Time in a Bottle",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[2]": "NEVER: Don't display HUD",
+
+  "text.autoconfig.tiab.option.client.hud.vertical_offset": "Vertical Offset",
+  "text.autoconfig.tiab.option.client.hud.vertical_offset.@Tooltip": "Vertical offset of the HUD from the center of the screen",
+
+  "text.autoconfig.tiab.option.client.hud.color": "Color",
+
+  "text.autoconfig.tiab.option.gameplay": "Gameplay",
+
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities": "Accelerate Block Entities",
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities.@Tooltip[0]": "Will the Time in a Bottle accelerate block entites?",
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities.@Tooltip[1]": "(e.g. furnaces, brewing stands, etc.)",
+
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly": "Accelerate Randomly",
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly.@Tooltip[0]": "Will the Time in a Bottle accelerate randomly ticking blocks?",
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly.@Tooltip[1]": "(e.g. wheat, sugar cane)",
+
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid": "Cancel If Invalid",
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid.@Tooltip[0]": "If the block being accelerated is no longer able to be,",
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid.@Tooltip[1]": "should the acceleration be cancelled?",
+
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time": "One Bottle at a Time",
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[0]": "Only the bottle with the most stored",
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[1]": "time on you will continue to accumulate time",
+
+  "text.autoconfig.tiab.option.gameplay.update_frequency": "Item Update Frequency",
+  "text.autoconfig.tiab.option.gameplay.update_frequency.@Tooltip": "How frequently, in ticks, the bottle's clock updates",
+
+  "text.autoconfig.tiab.option.gameplay.acceleration_duration": "Acceleration Duration",
+  "text.autoconfig.tiab.option.gameplay.acceleration_duration.@Tooltip": "How long, in ticks, the acceleration effect lasts",
+
+  "text.autoconfig.tiab.option.gameplay.acceleration_base": "Acceleration Base",
+  "text.autoconfig.tiab.option.gameplay.acceleration_base.@Tooltip": "The base of the extra ticks per level equation (x in x^y)",
+
+  "text.autoconfig.tiab.option.gameplay.max_level": "Maximum Level",
+  "text.autoconfig.tiab.option.gameplay.max_level.@Tooltip": "The exponent of the extra ticks per level equation (y in x^y)",
+
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range": "Random Acceleration Range",
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range.@Tooltip[0]": "The lower this value, the more frequently blocks will",
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range.@Tooltip[1]": "be randomly ticked. (i.e. lower = faster growing)"
 }

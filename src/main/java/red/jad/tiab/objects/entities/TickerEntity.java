@@ -19,9 +19,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
+import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.backend.SpawnPacketHelper;
-
-import java.util.Random;
 
 public class TickerEntity extends Entity {
 
@@ -41,15 +40,15 @@ public class TickerEntity extends Entity {
         }
 
         // Duration
-        if(TIAB.config.gameplay.acceleration_duration == 0 || this.age > TIAB.config.gameplay.acceleration_duration) perish();
+        if(TIAB.oldConfig.gameplay.acceleration_duration == 0 || this.age > TIAB.oldConfig.gameplay.acceleration_duration) perish();
 
         BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
         BlockState state = world.getBlockState(target);
 
-        if(TIAB.config.effects.particles && state.getOutlineShape(world, target) != null){
+        if(TIAB.oldConfig.effects.particles && state.getOutlineShape(world, target) != null){
             VoxelShape shape = state.getOutlineShape(world, target);
 
-            int rate = (TIAB.config.gameplay.max_level * 4) / getLevel();
+            int rate = (TIAB.oldConfig.gameplay.max_level * 4) / getLevel();
             if(rate <= 1 || this.age % rate == 0){
                 for(int x = 0; x <= 1; x++){
                     for(int z = 0; z <= 1; z++){
@@ -70,22 +69,19 @@ public class TickerEntity extends Entity {
 
         if(!world.isClient()){
             // If 'invalid' block, check config
-            if(TIAB.config.gameplay.cancel_if_invalid){
-                if((TIAB.config.gameplay.accelerate_block_entities && !state.getBlock().hasBlockEntity())
-                        && (TIAB.config.gameplay.accelerate_randomly && !state.getBlock().hasRandomTicks(state))) {
-                    perish();
-                }
+            if(TIAB.oldConfig.gameplay.cancel_if_invalid){
+                if(!Helpers.canTick(state) && !Helpers.canRandomlyTick(state)) perish();
             }
 
-            int howManyTicksToTick = (int) Math.pow(TIAB.config.gameplay.acceleration_base, getLevel()) - 1; // - 1 cus block is ticking itself
+            int howManyTicksToTick = (int) Math.pow(TIAB.oldConfig.gameplay.acceleration_base, getLevel()) - 1; // - 1 cus block is ticking itself
             for(int i = 0; i < howManyTicksToTick; i++){
-                if(TIAB.config.gameplay.accelerate_randomly && state.getBlock().hasRandomTicks(state)){
+                if(Helpers.canRandomlyTick(state)){
                     // random_acceleration_range lower = more likely to random tick
-                    if(this.world.getRandom().nextInt(TIAB.config.gameplay.random_acceleration_range) == 0){
+                    if(this.world.getRandom().nextInt(TIAB.oldConfig.gameplay.random_acceleration_range) == 0){
                         state.getBlock().randomTick(state, (ServerWorld) world, target, this.world.getRandom());
                     }
                 }
-                if(TIAB.config.gameplay.accelerate_block_entities && state.getBlock().hasBlockEntity()) {
+                if(Helpers.canTick(state)) {
                     BlockEntity tile = world.getBlockEntity(target);
                     if(tile != null && !tile.isRemoved() && tile instanceof Tickable){
                         ((Tickable) tile).tick();
@@ -96,9 +92,9 @@ public class TickerEntity extends Entity {
     }
 
     public void perish(){
-        if(TIAB.config.effects.play_sounds){
-            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, TIAB.config.effects.volume, 0.1f);
-            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, TIAB.config.effects.volume / 2, 1.5f);
+        if(TIAB.oldConfig.effects.play_sounds){
+            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume, 0.1f);
+            world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume / 2, 1.5f);
         }
         this.kill();
     }
@@ -110,7 +106,7 @@ public class TickerEntity extends Entity {
         if (!this.world.isClient) {
             // This disgusting assortment of mins and maxxes basically does...
             // 1 <-> level <-> (max_level, which itself is maxxed at 20)
-            this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), TIAB.config.gameplay.max_level), 1));
+            this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), TIAB.oldConfig.gameplay.max_level), 1));
         }
     }
 

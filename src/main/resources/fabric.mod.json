@@ -18,7 +18,8 @@
   "environment": "*",
   "entrypoints": {
     "main": [ "red.jad.tiab.TIAB" ],
-    "client": [ "red.jad.tiab.client.TIABClient" ]
+    "client": [ "red.jad.tiab.client.TIABClient" ],
+    "modmenu": [ "red.jad.tiab.config.ModMenuIntegration" ]
   },
   "mixins": [
     "tiab.mixins.json"

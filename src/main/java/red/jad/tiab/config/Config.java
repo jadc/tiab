@@ -1,53 +1,75 @@
 package red.jad.tiab.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.annotations.Expose;
-import net.fabricmc.loader.api.FabricLoader;
+import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
+import red.jad.tiab.TIAB;
 
-import java.io.*;
+@me.sargunvohra.mcmods.autoconfig1u.annotation.Config(name = TIAB.MOD_ID)
+@me.sargunvohra.mcmods.autoconfig1u.annotation.Config.Gui.Background("minecraft:textures/block/light_blue_concrete_powder.png")
+public class Config implements ConfigData {
 
-/*
-Thank you for the code, user11681
-https://github.com/user11681/fixscale/blob/1.16/src/main/java/user11681/scale/ScaleConfig.java
-(I'm allowed to just yoink this, right...?)
- */
-public class Config {
-    @Expose
-    public ConfigGameplay gameplay;
-    @Expose
-    public ConfigEffects effects;
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    Client client = new Client();
 
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-    private static final JsonParser PARSER = new JsonParser();
-    private final File file;
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
+    Gameplay gameplay = new Gameplay();
+    private static class Client implements ConfigData {
 
-    public Config(final String path) {
-        this.file = new File(FabricLoader.getInstance().getConfigDir().toFile(), path);
-        // Initialization
-        this.gameplay = new ConfigGameplay();
-        this.effects = new ConfigEffects();
-    }
+        enum effectType { CLOCK, PARTICLES, BOTH }
 
-    public void write() throws Throwable {
-        ((OutputStream) new FileOutputStream(this.file)).write(GSON.toJson(this).getBytes());
-    }
+        @ConfigEntry.Gui.Tooltip(count = 3)
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        private effectType effect_type = effectType.CLOCK;
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    public void read() throws Throwable {
-        if (this.file.createNewFile()) {
-            this.write();
-        } else {
-            final InputStream input = new FileInputStream(this.file);
-            final byte[] content = new byte[input.available()];
-            while (input.read(content) > -1);
-            final JsonObject element = (JsonObject) PARSER.parse(new String(content));
+        @ConfigEntry.BoundedDiscrete(min = 0, max = 100)
+        private int volume = 50;
 
-            // Reading
-            this.gameplay = GSON.fromJson(element.get("gameplay"), ConfigGameplay.class);
-            this.effects = GSON.fromJson(element.get("effects"), ConfigEffects.class);
+        @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+        HUDConfig hud = new HUDConfig();
+
+        private static class HUDConfig implements ConfigData {
+            enum displayWhen { HOVER, ALWAYS, NEVER }
+
+            @ConfigEntry.Gui.Tooltip(count = 3)
+            @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+            private displayWhen display_when = displayWhen.HOVER;
+
+            @ConfigEntry.Gui.Tooltip
+            private int vertical_offset = -16;
+
+            @ConfigEntry.ColorPicker
+            private int color = 0xffffff;
         }
+    }
+
+
+    private static class Gameplay implements ConfigData {
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        private boolean accelerate_block_entities = true;
+
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        private boolean accelerate_randomly = true;
+
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        private boolean cancel_if_invalid = true;
+
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        private boolean one_bottle_at_a_time = true;
+
+        @ConfigEntry.Gui.Tooltip
+        private int update_frequency = 20;
+
+        @ConfigEntry.Gui.Tooltip
+        private int acceleration_duration = 30*20;
+
+        @ConfigEntry.Gui.Tooltip
+        private int acceleration_base = 2;
+
+        @ConfigEntry.Gui.Tooltip
+        @ConfigEntry.BoundedDiscrete(min = 1, max = 19)
+        private int max_level = 5;
+
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        private int random_acceleration_range = 1365;
     }
 }
