@@ -1,21 +1,20 @@
 package red.jad.tiab.config;
 
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import red.jad.tiab.TIAB;
 
-@me.sargunvohra.mcmods.autoconfig1u.annotation.Config(name = TIAB.MOD_ID)
-@me.sargunvohra.mcmods.autoconfig1u.annotation.Config.Gui.Background("minecraft:textures/block/light_blue_concrete_powder.png")
-public class Config implements ConfigData {
+@Config(name = TIAB.MOD_ID)
+@Config.Gui.Background("minecraft:textures/block/light_blue_concrete_powder.png")
+public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-    public Client client = new Client();
+    Client client = new Client();
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
-    public Gameplay gameplay = new Gameplay();
-    public static class Client implements ConfigData {
-
-        public enum effectType { CLOCK, PARTICLES, BOTH }
+    Gameplay gameplay = new Gameplay();
+    private class Client implements ConfigData {
 
         @ConfigEntry.Gui.Tooltip(count = 3)
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
@@ -27,8 +26,7 @@ public class Config implements ConfigData {
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
         public HUDConfig hud = new HUDConfig();
 
-        public static class HUDConfig implements ConfigData {
-            public enum displayWhen { HOVER, ALWAYS, NEVER }
+        class HUDConfig implements ConfigData {
 
             @ConfigEntry.Gui.Tooltip(count = 3)
             @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
@@ -43,7 +41,7 @@ public class Config implements ConfigData {
     }
 
 
-    public static class Gameplay implements ConfigData {
+    private class Gameplay implements ConfigData {
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean accelerate_block_entities = true;
 
@@ -72,4 +70,35 @@ public class Config implements ConfigData {
         @ConfigEntry.Gui.Tooltip(count = 2)
         public int random_acceleration_range = 1365;
     }
+
+    @Override
+    public effectType getEffectType(){ return this.client.effect_type; }
+    @Override
+    public int getVolume(){ return this.client.volume; }
+    @Override
+    public displayWhen getDisplayWhen(){ return this.client.hud.display_when; }
+    @Override
+    public int getVerticalOffset(){ return this.client.hud.vertical_offset; }
+    @Override
+    public int getColor(){ return this.client.hud.color; }
+
+    @Override
+    public boolean getAccelerateBlockEntities(){ return this.gameplay.accelerate_block_entities; }
+    @Override
+    public boolean getAccelerateRandomly(){ return this.gameplay.accelerate_randomly; }
+    @Override
+    public boolean getCancelIfInvalid(){ return this.gameplay.cancel_if_invalid; }
+    @Override
+    public boolean getOneBottleAtATime(){ return this.gameplay.one_bottle_at_a_time; }
+    @Override
+    public int getUpdateFrequency(){ return this.gameplay.update_frequency; }
+    @Override
+    public int getAccelerationDuration(){ return this.gameplay.acceleration_duration; }
+    @Override
+    public int getAccelerationBase(){ return this.gameplay.acceleration_base; }
+    @Override
+    public int getMaxLevel(){ return this.gameplay.max_level; }
+    @Override
+    public int getRandomAccelerationRange(){ return this.gameplay.random_acceleration_range; }
+
 }

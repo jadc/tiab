@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -27,7 +26,6 @@ import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.client.TimeTooltip;
-import red.jad.tiab.config.Config;
 import red.jad.tiab.objects.entities.TickerEntity;
 
 import java.util.List;
@@ -95,15 +93,15 @@ public class TimeBottleItem extends Item {
             PlayerEntity player = (PlayerEntity) entity;
             long time = world.getTime();
             if(!world.isClient){
-                if(TIAB.config.gameplay.update_frequency <= 1 || time % TIAB.config.gameplay.update_frequency == 0){
+                if(TIAB.config.getUpdateFrequency() <= 1 || time % TIAB.config.getUpdateFrequency() == 0){
                     // Only allow largest bottle to accumulate time
-                    if(TIAB.config.gameplay.one_bottle_at_a_time){
+                    if(TIAB.config.getOneBottleAtATime()){
                         for(int i = 0; i < player.inventory.size(); i++){
                             ItemStack other = player.inventory.getStack(i);
                             if(other.getItem() == this && other != stack){
                                 // if other has less stored ticks
                                 if(getLastUsed(other) > getLastUsed(stack)){
-                                    setLastUsed(other, getLastUsed(other) + TIAB.config.gameplay.update_frequency);
+                                    setLastUsed(other, getLastUsed(other) + TIAB.config.getUpdateFrequency());
                                 }
                             }
                         }
@@ -112,7 +110,7 @@ public class TimeBottleItem extends Item {
                     // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
                     setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
                     if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
-                    setLastEquipped(stack, time + TIAB.config.gameplay.update_frequency);
+                    setLastEquipped(stack, time + TIAB.config.getUpdateFrequency());
                 }
             }
         }
@@ -131,7 +129,7 @@ public class TimeBottleItem extends Item {
 
                 if(!world.isClient()){
                     boolean valid = false;
-                    double baseCost = player.isCreative() ? 0 : TIAB.config.gameplay.acceleration_duration;
+                    double baseCost = player.isCreative() ? 0 : TIAB.config.getAccelerationDuration();
                     double cost = baseCost;
                     long storedTicks = world.getTime() - getLastUsed(stack);
 
@@ -142,8 +140,8 @@ public class TimeBottleItem extends Item {
                         valid = true;
                     }else{
                         TickerEntity ticker = tickersInBlock.get();
-                        if(ticker.getLevel() < TIAB.config.gameplay.max_level) {
-                            cost = baseCost * Math.pow(TIAB.config.gameplay.acceleration_base, ticker.getLevel());
+                        if(ticker.getLevel() < TIAB.config.getMaxLevel()) {
+                            cost = baseCost * Math.pow(TIAB.config.getAccelerationBase(), ticker.getLevel());
                             if (storedTicks >= cost) {
                                 ticker.setLevel(ticker.getLevel() + 1);
                                 ticker.age = 0;
@@ -154,7 +152,7 @@ public class TimeBottleItem extends Item {
 
                     if(valid){
                         setLastUsed(stack, getLastUsed(stack) + (long)cost);
-                        if(TIAB.config.client.volume > 0){
+                        if(TIAB.config.getVolume() > 0){
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE);
 
