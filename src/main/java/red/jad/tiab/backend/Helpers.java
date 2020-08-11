@@ -26,7 +26,7 @@ public class Helpers {
         return canTick(target) || canRandomlyTick(target);
     }
 
-    public static void playSound(World world, BlockPos pos, SoundEvent sound){
-        world.playSound(null, pos, sound, SoundCategory.BLOCKS, ((float)(TIAB.config.getVolume())) / 100, 0.1f);
+    public static void playSound(World world, BlockPos pos, SoundEvent sound, float pitch){
+        world.playSound(null, pos, sound, SoundCategory.BLOCKS, ((float)(TIAB.config.getVolume())) / 100, pitch);
     }
 }
