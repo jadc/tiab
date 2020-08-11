@@ -153,8 +153,8 @@ public class TimeBottleItem extends Item {
                     if(valid){
                         setLastUsed(stack, getLastUsed(stack) + (long)cost);
                         if(TIAB.config.getVolume() > 0){
-                            Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
-                            Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE);
+                            Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.5f);
+                            Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, 1.5f);
 
                             //world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume, 1.5f);
                             //world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume / 2, 1.5f);

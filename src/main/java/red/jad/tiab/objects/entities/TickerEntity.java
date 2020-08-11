@@ -95,8 +95,8 @@ public class TickerEntity extends Entity {
 
     public void perish(){
         if(TIAB.config.getVolume() > 0){
-            Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL);
-            Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE);
+            Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, 0.1f);
+            Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, 1.5f);
             //world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, ((float)(TIAB.config.client.volume)) / 100, 0.1f);
             //world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, (((float)(TIAB.config.client.volume)) / 100) / 2, 1.5f);
         }
