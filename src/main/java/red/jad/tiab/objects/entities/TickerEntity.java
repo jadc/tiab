@@ -9,6 +9,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -22,6 +23,9 @@ import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.backend.SpawnPacketHelper;
 import red.jad.tiab.config.DefaultConfig;
 
+/*
+    Responsible to accelerating the blocks themselves
+ */
 public class TickerEntity extends Entity {
 
     private static final TrackedData<Integer> LEVEL = DataTracker.registerData(TickerEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -36,11 +40,12 @@ public class TickerEntity extends Entity {
         // Anti-crash
         if(getLevel() <= 0 || getLevel() > 20){
             if(!this.world.isClient()) TIAB.LOG.warn("'{}' at [{}, {}, {}] had an invalid level of {} and was removed to avoid crashing the game; lower the configured max level below 20!", this.getDisplayName().getString(), this.getX(), this.getY(), this.getZ(), getLevel());
+            world.addParticle(ParticleTypes.BARRIER, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
             perish();
         }
 
         // Duration
-        if(TIAB.config.getAccelerationDuration() == 0 || this.age > TIAB.config.getAccelerationDuration()) perish();
+        //if(TIAB.config.getAccelerationDuration() == 0 || this.age > TIAB.config.getAccelerationDuration()) perish();
 
         BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
         BlockState state = world.getBlockState(target);
@@ -97,8 +102,6 @@ public class TickerEntity extends Entity {
         if(TIAB.config.getVolume() > 0){
             Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, 0.1f);
             Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, 1.5f);
-            //world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, ((float)(TIAB.config.client.volume)) / 100, 0.1f);
-            //world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, (((float)(TIAB.config.client.volume)) / 100) / 2, 1.5f);
         }
         this.kill();
     }

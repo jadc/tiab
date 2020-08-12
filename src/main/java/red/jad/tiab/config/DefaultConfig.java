@@ -2,6 +2,10 @@ package red.jad.tiab.config;
 
 import red.jad.tiab.backend.Helpers;
 
+/*
+    Used if AutoConfig is not present.
+    Constants that cannot be configured due to no AutoConfig.
+ */
 public class DefaultConfig {
     // Enumerators
     public enum effectType { CLOCK, PARTICLES, BOTH }

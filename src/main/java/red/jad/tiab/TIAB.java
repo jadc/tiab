@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.Logger;
+import red.jad.tiab.backend.CrouchlessUseHandler;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.config.AutoConfigIntegration;
 import red.jad.tiab.config.DefaultConfig;
@@ -39,6 +40,9 @@ public class TIAB implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+
+		CrouchlessUseHandler.init();
+
 		Registry.register(Registry.ITEM, id("time_in_a_bottle"), TIME_IN_A_BOTTLE);
 
 		if(FabricLoader.getInstance().isModLoaded(Helpers.AUTOCONFIG_MOD_ID)){
