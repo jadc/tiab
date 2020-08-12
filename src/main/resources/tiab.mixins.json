@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "red.jad.tiab.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
-  "client": ["TIABHudMixin"],
+  "mixins": [ ],
+  "client": [ "InGameHudMixin" ],
   "injectors": { "defaultRequire": 1 }
 }

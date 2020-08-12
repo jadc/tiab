@@ -21,6 +21,9 @@ import red.jad.tiab.objects.entities.TickerEntity;
 
 import static net.minecraft.client.util.math.Vector3f.*;
 
+/*
+    Creates the rotating clock effect
+ */
 public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
     public TickerEntityRenderer(EntityRenderDispatcher dispatcher) {
         super(dispatcher);

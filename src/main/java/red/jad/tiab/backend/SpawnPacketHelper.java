@@ -10,6 +10,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import red.jad.tiab.TIAB;
 
+/*
+    Fabric doesn't work properly for entities not extending MobEntity.
+    Fabric pls fix this shit so I can remove it
+ */
 public final class SpawnPacketHelper {
     public static final Identifier SPAWN_PACKET = TIAB.id("spawn/nonliving/generic");
 

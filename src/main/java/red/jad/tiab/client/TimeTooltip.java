@@ -9,19 +9,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.Helpers;
-import red.jad.tiab.backend.TimeFormatter;
 import red.jad.tiab.config.DefaultConfig;
 import red.jad.tiab.objects.items.TimeBottleItem;
 
+import java.awt.*;
+
+/*
+    Clock HUD that appears when holding the TIAB
+ */
 public class TimeTooltip {
 
+    @Environment(EnvType.CLIENT)
     public static MutableText getText(World world, ItemStack stack, boolean isInfinite){
-        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : new LiteralText(TimeFormatter.ticksToTime(world.getTime() - TimeBottleItem.getLastUsed(stack))));
+        return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : new LiteralText(Helpers.ticksToTime(world.getTime() - TimeBottleItem.getLastUsed(stack))));
     }
 
     @Environment(EnvType.CLIENT)
@@ -36,7 +42,7 @@ public class TimeTooltip {
                     if(TIAB.config.getDisplayWhen() == DefaultConfig.displayWhen.ALWAYS || Helpers.isAcceleratable(target)){
                         client.getProfiler().push(new Identifier(TIAB.MOD_ID, "time_tooltip").toString());
 
-                        MutableText text = getText(client.world, client.player.getActiveItem(), client.player.isCreative());
+                        MutableText text = getText(client.world, client.player.getMainHandStack(), client.player.isCreative());
                         int textWidth = client.inGameHud.getFontRenderer().getWidth(text);
 
                         float centeredX = (screenWidth - textWidth) / 2f;

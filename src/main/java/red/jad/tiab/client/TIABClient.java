@@ -9,6 +9,10 @@ import red.jad.tiab.TIAB;
 import red.jad.tiab.backend.SpawnPacketHelper;
 import red.jad.tiab.objects.entities.render.TickerEntityRenderer;
 
+/*
+    Fabric doesn't work properly for entities not extending MobEntity.
+    Fabric pls fix this shit so I can remove it
+ */
 @Environment(EnvType.CLIENT)
 public class TIABClient implements ClientModInitializer {
     @Override

@@ -12,6 +12,10 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.UUID;
 
+/*
+    Fabric doesn't work properly for entities not extending MobEntity.
+    Fabric pls fix this shit so I can remove it
+ */
 @Environment(EnvType.CLIENT)
 final class ClientNetworking {
     static void spawnNonLivingEntity(PacketContext context, PacketByteBuf buf) {

@@ -12,8 +12,11 @@ import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.client.TimeTooltip;
 import red.jad.tiab.config.DefaultConfig;
 
+/*
+    Injects into HUD to display TIAB clock
+ */
 @Mixin(InGameHud.class)
-public class TIABHudMixin {
+public class InGameHudMixin {
     @Shadow private int scaledWidth;
     @Shadow private int scaledHeight;
 

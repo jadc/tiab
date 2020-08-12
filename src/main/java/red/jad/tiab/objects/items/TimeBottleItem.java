@@ -1,5 +1,6 @@
 package red.jad.tiab.objects.items;
 
+import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -24,6 +25,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import red.jad.tiab.TIAB;
+import red.jad.tiab.backend.CrouchlessInterface;
+import red.jad.tiab.backend.CrouchlessUseHandler;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.client.TimeTooltip;
 import red.jad.tiab.objects.entities.TickerEntity;
@@ -31,7 +34,11 @@ import red.jad.tiab.objects.entities.TickerEntity;
 import java.util.List;
 import java.util.Optional;
 
-public class TimeBottleItem extends Item {
+public class TimeBottleItem extends Item implements CrouchlessInterface {
+
+    // Constants
+    private static final String lastUsed = "lastUsed";
+    private static final String lastEquipped = "lastEquipped";
 
     public TimeBottleItem() {
         super(new Item.Settings()
@@ -42,32 +49,32 @@ public class TimeBottleItem extends Item {
     }
 
     /*
-    NBT and misc exclusive methods
+        NBT and misc exclusive methods
      */
-    private void setLastUsed(ItemStack stack, long last){
+    public void setLastUsed(ItemStack stack, long last){
         CompoundTag tag = getOrCreateTag(stack);
-        tag.putLong("lastUsed", last);
+        tag.putLong(lastUsed, last);
         stack.setTag(tag);
     }
 
     public static long getLastUsed(ItemStack stack){
         CompoundTag tag = getOrCreateTag(stack);
-        if(tag.contains("lastUsed")){
-            return tag.getLong("lastUsed");
+        if(tag.contains(lastUsed)){
+            return tag.getLong(lastUsed);
         }
         return 0;
     }
 
-    private void setLastEquipped(ItemStack stack, long last){
+    public void setLastEquipped(ItemStack stack, long last){
         CompoundTag tag = getOrCreateTag(stack);
-        tag.putLong("lastEquipped", last);
+        tag.putLong(lastEquipped, last);
         stack.setTag(tag);
     }
 
-    private long getLastEquipped(ItemStack stack){
+    public long getLastEquipped(ItemStack stack){
         CompoundTag tag = getOrCreateTag(stack);
-        if(tag.contains("lastEquipped")){
-            return tag.getLong("lastEquipped");
+        if(tag.contains(lastEquipped)){
+            return tag.getLong(lastEquipped);
         }
         return 0;
     }
@@ -83,7 +90,7 @@ public class TimeBottleItem extends Item {
     }
 
     /*
-    Tick storage
+        Tick storage
      */
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
@@ -116,8 +123,11 @@ public class TimeBottleItem extends Item {
         }
     }
 
+    /*
+        Applies block acceleration
+     */
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public ActionResult onItemUseFirst(ItemUsageContext context) {
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getBlockPos();
@@ -155,9 +165,6 @@ public class TimeBottleItem extends Item {
                         if(TIAB.config.getVolume() > 0){
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.5f);
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, 1.5f);
-
-                            //world.playSound(null, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume, 1.5f);
-                            //world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, TIAB.oldConfig.effects.volume / 2, 1.5f);
                         }
                         return ActionResult.SUCCESS;
                     }

@@ -5,6 +5,10 @@ import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import red.jad.tiab.TIAB;
 
+/*
+    Only used when AutoConfig is present
+    Overrides getters from DefaultConfig class
+ */
 @Config(name = TIAB.MOD_ID)
 @Config.Gui.Background("minecraft:textures/block/light_blue_concrete_powder.png")
 public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
