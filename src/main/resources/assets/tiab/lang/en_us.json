@@ -4,7 +4,7 @@
   "tooltip.tiab.time_in_a_bottle.delimiter": ":",
   "tooltip.tiab.time_in_a_bottle.infinity": "\u221e",
 
-  "text.autoconfig.tiab.title": "Time in a Bottle Configuration",
+  "text.autoconfig.tiab.title": "Time in a Bottle",
   "text.autoconfig.tiab.option.client": "Client",
 
   "text.autoconfig.tiab.option.client.effect_type": "Effect Type",
@@ -15,7 +15,7 @@
   "text.autoconfig.tiab.option.client.volume": "Volume (%)",
   "text.autoconfig.tiab.option.client.hud": "HUD",
 
-  "text.autoconfig.tiab.option.client.hud.display_when": "Display when...",
+  "text.autoconfig.tiab.option.client.hud.display_when": "Display When",
   "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[0]": "HOVER: Display when hovering over a valid block",
   "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[1]": "ALWAYS: Display when holding the Time in a Bottle",
   "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[2]": "NEVER: Don't display HUD",
@@ -41,7 +41,7 @@
 
   "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time": "One Bottle at a Time",
   "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[0]": "Only the bottle with the most stored",
-  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[1]": "time on you will continue to accumulate time",
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[1]": "will continue to accumulate time",
 
   "text.autoconfig.tiab.option.gameplay.update_frequency": "Item Update Frequency",
   "text.autoconfig.tiab.option.gameplay.update_frequency.@Tooltip": "How frequently, in ticks, the bottle's clock updates",

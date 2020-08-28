@@ -2,5 +2,6 @@
   "item.tiab.time_in_a_bottle": "زمن في زجاجة",
   "tooltip.tiab.time_in_a_bottle": "\u231b %s",
   "tooltip.tiab.time_in_a_bottle.delimiter": ":",
-  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e"
+  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e",
+  "text.autoconfig.tiab.title": "زمن في زجاجة"
 }
