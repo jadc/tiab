@@ -3,6 +3,7 @@ package red.jad.tiab.config;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
+import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
 import red.jad.tiab.TIAB;
 
 /*
@@ -20,6 +21,7 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
     Gameplay gameplay = new Gameplay();
     private class Client implements ConfigData {
 
+        @Comment("CLOCK: Rotating clock on all sides of the block. PARTICLES: Flashing particles on every corner of the block. BOTH: Both effects at the same time")
         @ConfigEntry.Gui.Tooltip(count = 3)
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
         public effectType effect_type = effectType.CLOCK;
@@ -32,10 +34,12 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
 
         class HUDConfig implements ConfigData {
 
+            @Comment("HOVER: Display when hovering over a valid block. ALWAYS: Display when holding the Time in a Bottle. NEVER: Don't display HUD")
             @ConfigEntry.Gui.Tooltip(count = 3)
             @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
             public displayWhen display_when = displayWhen.HOVER;
 
+            @Comment("Vertical offset of the HUD from the center of the screen")
             @ConfigEntry.Gui.Tooltip
             public int vertical_offset = -16;
 
@@ -46,31 +50,40 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
 
 
     private class Gameplay implements ConfigData {
+        @Comment("Will the Time in a Bottle accelerate block entites? (e.g. furnaces, brewing stands, etc.)")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean accelerate_block_entities = true;
 
+        @Comment("Will the Time in a Bottle accelerate randomly ticking blocks? (e.g. wheat, sugar cane)")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean accelerate_randomly = true;
 
+        @Comment("If the block being accelerated is no longer able to be, should the acceleration be cancelled?")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean cancel_if_invalid = true;
 
+        @Comment("Only the bottle with the most stored time on you will continue to accumulate time")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean one_bottle_at_a_time = true;
 
+        @Comment("How frequently, in ticks, the bottle's clock updates")
         @ConfigEntry.Gui.Tooltip
         public int update_frequency = 20;
 
+        @Comment("How long, in ticks, the acceleration effect lasts")
         @ConfigEntry.Gui.Tooltip
         public int acceleration_duration = 30*20;
 
+        @Comment("The base of the extra ticks per level equation (x in x^y)")
         @ConfigEntry.Gui.Tooltip
         public int acceleration_base = 2;
 
+        @Comment("The exponent of the extra ticks per level equation (y in x^y)")
         @ConfigEntry.Gui.Tooltip
         @ConfigEntry.BoundedDiscrete(min = 1, max = 19)
         public int max_level = 5;
 
+        @Comment("The lower this value, the more frequently blocks will be randomly ticked. (i.e. lower = faster growing)")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public int random_acceleration_range = 1365;
     }

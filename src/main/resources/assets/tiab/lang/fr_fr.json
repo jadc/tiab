@@ -1,6 +1,61 @@
 {
-  "item.tiab.time_in_a_bottle": "Temps dans une bouteille",
+  "item.tiab.time_in_a_bottle": "Temps dans une Bouteille",
   "tooltip.tiab.time_in_a_bottle": "\u231b %s",
   "tooltip.tiab.time_in_a_bottle.delimiter": ":",
-  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e"
+  "tooltip.tiab.time_in_a_bottle.infinity": "\u221e",
+
+  "text.autoconfig.tiab.title": "Temps dans une Bouteille",
+  "text.autoconfig.tiab.option.client": "Client",
+
+  "text.autoconfig.tiab.option.client.effect_type": "Type d'effet graphique",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[0]": "CLOCK: Horloge tournante sur le bloc, tous côtés",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[1]": "PARTICLES: Particules clignotantes; chaque coin du le bloc",
+  "text.autoconfig.tiab.option.client.effect_type.@Tooltip[2]": "BOTH: Tous les effets mentionnés en même temps",
+
+  "text.autoconfig.tiab.option.client.volume": "Volume audio (%)",
+  "text.autoconfig.tiab.option.client.hud": "Affichage Heads-Up",
+
+  "text.autoconfig.tiab.option.client.hud.display_when": "Afficher quand...",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[0]": "HOVER: Affichage quand vous pointez sur un bloc",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[1]": "ALWAYS: Affichage quand tenant le temps dans une bouteille",
+  "text.autoconfig.tiab.option.client.hud.display_when.@Tooltip[2]": "NEVER: Ne pas afficher l'Affichage Heads-Up",
+
+  "text.autoconfig.tiab.option.client.hud.vertical_offset": "Décalage vertical",
+  "text.autoconfig.tiab.option.client.hud.vertical_offset.@Tooltip": "Décalage vertical de l'Affichage Heads-Up du centre de l'écran",
+
+  "text.autoconfig.tiab.option.client.hud.color": "Couleur",
+
+  "text.autoconfig.tiab.option.gameplay": "Gameplay",
+
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities": "Accélérer les entités du bloc",
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities.@Tooltip[0]": "Le temps dans une bouteille accélère-t-il les blocs?",
+  "text.autoconfig.tiab.option.gameplay.accelerate_block_entities.@Tooltip[1]": "(e.g. les fourneaus, les alambics, etc.)",
+
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly": "Accélérez au hasard",
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly.@Tooltip[0]": "Le temps dans une bouteille accélère-t-il aléatoirement de ticks par blocs?",
+  "text.autoconfig.tiab.option.gameplay.accelerate_randomly.@Tooltip[1]": "(e.g. blé, canne à sucre)",
+
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid": "Arrêter si invalide",
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid.@Tooltip[0]": "Si le bloc accéléré ne peut plus être accéléré,",
+  "text.autoconfig.tiab.option.gameplay.cancel_if_invalid.@Tooltip[1]": "l'accélération doit-elle être annulée?",
+
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time": "Une bouteille à la fois",
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[0]": "Seulement la bouteille avec le plus stocké",
+  "text.autoconfig.tiab.option.gameplay.one_bottle_at_a_time.@Tooltip[1]": "continuera à accumuler du temps",
+
+  "text.autoconfig.tiab.option.gameplay.update_frequency": "Fréquence de mise à jour de l'outil",
+  "text.autoconfig.tiab.option.gameplay.update_frequency.@Tooltip": "À quelle fréquence, en ticks, l'horloge de la bouteille se met à jour",
+
+  "text.autoconfig.tiab.option.gameplay.acceleration_duration": "Durée d'accélération",
+  "text.autoconfig.tiab.option.gameplay.acceleration_duration.@Tooltip": "Combien de temps, en ticks, dure l'effet d'accélération",
+
+  "text.autoconfig.tiab.option.gameplay.acceleration_base": "Acceleration Base",
+  "text.autoconfig.tiab.option.gameplay.acceleration_base.@Tooltip": "La base de ticks supplémentaires (x en x^y)",
+
+  "text.autoconfig.tiab.option.gameplay.max_level": "Niveau maximum",
+  "text.autoconfig.tiab.option.gameplay.max_level.@Tooltip": "L'exposant de ticks supplémentaires (y en x^y)",
+
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range": "Limites d'accélération aléatoire",
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range.@Tooltip[0]": "Plus cette valeur est basse, plus les blocs seront",
+  "text.autoconfig.tiab.option.gameplay.random_acceleration_range.@Tooltip[1]": "fréquemment 'ticked' au hasard (Exemple: valeur inférieure = croît plus vite)"
 }
