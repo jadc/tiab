@@ -14,8 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import red.jad.tiab.TIAB;
-import red.jad.tiab.backend.Helpers;
+import red.jad.tiab.Main;
 import red.jad.tiab.config.DefaultConfig;
 import red.jad.tiab.objects.entities.TickerEntity;
 
@@ -39,7 +38,7 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
         final ItemStack stack = new ItemStack(Items.CLOCK);
         float time = entity.getEntityWorld().getTime() + tickDelta;
 
-        if(TIAB.config.getEffectType() != DefaultConfig.effectType.PARTICLES){
+        if(Main.config.getEffectType() != DefaultConfig.effectType.PARTICLES){
             for(Direction d : Direction.values()){
                 if(!d.equals(Direction.DOWN) && !d.equals(Direction.UP)){
                     // don't render if inside block

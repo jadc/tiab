@@ -6,7 +6,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import red.jad.tiab.TIAB;
+import red.jad.tiab.Main;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,11 +35,11 @@ public class Helpers {
     }
 
     public static boolean canRandomlyTick(BlockState target){
-        return (TIAB.config.getAccelerateRandomly() && target.getBlock().hasRandomTicks(target));
+        return (Main.config.getAccelerateRandomly() && target.getBlock().hasRandomTicks(target));
     }
 
     public static boolean canTick(BlockState target){
-        return (TIAB.config.getAccelerateBlockEntities() && target.getBlock().hasBlockEntity());
+        return (Main.config.getAccelerateBlockEntities() && target.getBlock().hasBlockEntity());
     }
 
     public static boolean isAcceleratable(BlockState target){
@@ -47,6 +47,6 @@ public class Helpers {
     }
 
     public static void playSound(World world, BlockPos pos, SoundEvent sound, float pitch){
-        world.playSound(null, pos, sound, SoundCategory.BLOCKS, ((float)(TIAB.config.getVolume())) / 100, pitch);
+        world.playSound(null, pos, sound, SoundCategory.BLOCKS, ((float)(Main.config.getVolume())) / 100, pitch);
     }
 }

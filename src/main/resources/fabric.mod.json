@@ -17,13 +17,11 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [ "red.jad.tiab.TIAB" ],
-    "client": [ "red.jad.tiab.client.TIABClient" ],
+    "main": [ "red.jad.tiab.Main" ],
+    "client": [ "red.jad.tiab.Main" ],
     "modmenu": [ "red.jad.tiab.config.ModMenuIntegration" ]
   },
-  "mixins": [
-    "tiab.mixins.json"
-  ],
+  "mixins": [ "tiab.mixins.json" ],
 
   "depends": {
     "fabricloader": ">=0.7.4",

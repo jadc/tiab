@@ -17,8 +17,8 @@ import java.util.UUID;
     Fabric pls fix this shit so I can remove it
  */
 @Environment(EnvType.CLIENT)
-final class ClientNetworking {
-    static void spawnNonLivingEntity(PacketContext context, PacketByteBuf buf) {
+public final class ClientNetworking {
+    public static void spawnNonLivingEntity(PacketContext context, PacketByteBuf buf) {
         int entityId = buf.readVarInt();
         UUID entityUuid = buf.readUuid();
         Identifier typeId = buf.readIdentifier();

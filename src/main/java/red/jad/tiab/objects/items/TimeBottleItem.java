@@ -1,6 +1,5 @@
 package red.jad.tiab.objects.items;
 
-import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -24,9 +23,8 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import red.jad.tiab.TIAB;
+import red.jad.tiab.Main;
 import red.jad.tiab.backend.CrouchlessInterface;
-import red.jad.tiab.backend.CrouchlessUseHandler;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.client.TimeTooltip;
 import red.jad.tiab.objects.entities.TickerEntity;
@@ -100,15 +98,15 @@ public class TimeBottleItem extends Item implements CrouchlessInterface {
             PlayerEntity player = (PlayerEntity) entity;
             long time = world.getTime();
             if(!world.isClient){
-                if(TIAB.config.getUpdateFrequency() <= 1 || time % TIAB.config.getUpdateFrequency() == 0){
+                if(Main.config.getUpdateFrequency() <= 1 || time % Main.config.getUpdateFrequency() == 0){
                     // Only allow largest bottle to accumulate time
-                    if(TIAB.config.getOneBottleAtATime()){
+                    if(Main.config.getOneBottleAtATime()){
                         for(int i = 0; i < player.inventory.size(); i++){
                             ItemStack other = player.inventory.getStack(i);
                             if(other.getItem() == this && other != stack){
                                 // if other has less stored ticks
                                 if(getLastUsed(other) > getLastUsed(stack)){
-                                    setLastUsed(other, getLastUsed(other) + TIAB.config.getUpdateFrequency());
+                                    setLastUsed(other, getLastUsed(other) + Main.config.getUpdateFrequency());
                                 }
                             }
                         }
@@ -117,7 +115,7 @@ public class TimeBottleItem extends Item implements CrouchlessInterface {
                     // Difference of current time to last equipped timestamp added to last used. This makes the stored ticks stop counting when not on you.
                     setLastUsed(stack, getLastUsed(stack) + (time - getLastEquipped(stack)));
                     if(getLastUsed(stack) <= 0) setLastUsed(stack, time);
-                    setLastEquipped(stack, time + TIAB.config.getUpdateFrequency());
+                    setLastEquipped(stack, time + Main.config.getUpdateFrequency());
                 }
             }
         }
@@ -139,19 +137,19 @@ public class TimeBottleItem extends Item implements CrouchlessInterface {
 
                 if(!world.isClient()){
                     boolean valid = false;
-                    double baseCost = player.isCreative() ? 0 : TIAB.config.getAccelerationDuration();
+                    double baseCost = player.isCreative() ? 0 : Main.config.getAccelerationDuration();
                     double cost = baseCost;
                     long storedTicks = world.getTime() - getLastUsed(stack);
 
                     Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
 
                     if(!tickersInBlock.isPresent()){
-                        TIAB.TICKER.spawn((ServerWorld) world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
+                        Main.TICKER.spawn((ServerWorld) world, null, null, null, pos, SpawnReason.TRIGGERED, false, false);
                         valid = true;
                     }else{
                         TickerEntity ticker = tickersInBlock.get();
-                        if(ticker.getLevel() < TIAB.config.getMaxLevel()) {
-                            cost = baseCost * Math.pow(TIAB.config.getAccelerationBase(), ticker.getLevel());
+                        if(ticker.getLevel() < Main.config.getMaxLevel()) {
+                            cost = baseCost * Math.pow(Main.config.getAccelerationBase(), ticker.getLevel());
                             if (storedTicks >= cost) {
                                 ticker.setLevel(ticker.getLevel() + 1);
                                 ticker.age = 0;
@@ -162,7 +160,7 @@ public class TimeBottleItem extends Item implements CrouchlessInterface {
 
                     if(valid){
                         setLastUsed(stack, getLastUsed(stack) + (long)cost);
-                        if(TIAB.config.getVolume() > 0){
+                        if(Main.config.getVolume() > 0){
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.5f);
                             Helpers.playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, 1.5f);
                         }

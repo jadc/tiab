@@ -9,7 +9,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -18,7 +17,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
-import red.jad.tiab.TIAB;
+import org.apache.logging.log4j.LogManager;
+import red.jad.tiab.Main;
 import red.jad.tiab.backend.Helpers;
 import red.jad.tiab.backend.SpawnPacketHelper;
 import red.jad.tiab.config.DefaultConfig;
@@ -39,8 +39,7 @@ public class TickerEntity extends Entity {
         super.tick();
         // Anti-crash
         if(getLevel() <= 0 || getLevel() > 20){
-            if(!this.world.isClient()) TIAB.LOG.warn("'{}' at [{}, {}, {}] had an invalid level of {} and was removed to avoid crashing the game; lower the configured max level below 20!", this.getDisplayName().getString(), this.getX(), this.getY(), this.getZ(), getLevel());
-            world.addParticle(ParticleTypes.BARRIER, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+            if(!this.world.isClient()) LogManager.getLogger(Main.MOD_ID).warn("'{}' at [{}, {}, {}] had an invalid level of {} and was removed to avoid crashing the game; lower the configured max level below 20!", this.getDisplayName().getString(), this.getX(), this.getY(), this.getZ(), getLevel());
             perish();
         }
 
@@ -50,11 +49,11 @@ public class TickerEntity extends Entity {
         BlockPos target = new BlockPos(this.getX(), this.getY(), this.getZ());
         BlockState state = world.getBlockState(target);
 
-        if(TIAB.config.getEffectType() != DefaultConfig.effectType.CLOCK){
+        if(Main.config.getEffectType() != DefaultConfig.effectType.CLOCK){
             if(state.getOutlineShape(world, target) != null){
                 VoxelShape shape = state.getOutlineShape(world, target);
 
-                int rate = (TIAB.config.getMaxLevel() * 4) / getLevel();
+                int rate = (Main.config.getMaxLevel() * 4) / getLevel();
                 if(rate <= 1 || this.age % rate == 0){
                     for(int x = 0; x <= 1; x++){
                         for(int z = 0; z <= 1; z++){
@@ -76,15 +75,15 @@ public class TickerEntity extends Entity {
 
         if(!world.isClient()){
             // If 'invalid' block, check config
-            if(TIAB.config.getCancelIfInvalid()){
+            if(Main.config.getCancelIfInvalid()){
                 if(!Helpers.canTick(state) && !Helpers.canRandomlyTick(state)) perish();
             }
 
-            int howManyTicksToTick = (int) Math.pow(TIAB.config.getAccelerationBase(), getLevel()) - 1; // - 1 cus block is ticking itself
+            int howManyTicksToTick = (int) Math.pow(Main.config.getAccelerationBase(), getLevel()) - 1; // - 1 cus block is ticking itself
             for(int i = 0; i < howManyTicksToTick; i++){
                 if(Helpers.canRandomlyTick(state)){
                     // random_acceleration_range lower = more likely to random tick
-                    if(this.world.getRandom().nextInt(TIAB.config.getRandomAccelerationRange()) == 0){
+                    if(this.world.getRandom().nextInt(Main.config.getRandomAccelerationRange()) == 0){
                         state.getBlock().randomTick(state, (ServerWorld) world, target, this.world.getRandom());
                     }
                 }
@@ -99,7 +98,7 @@ public class TickerEntity extends Entity {
     }
 
     public void perish(){
-        if(TIAB.config.getVolume() > 0){
+        if(Main.config.getVolume() > 0){
             Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, 0.1f);
             Helpers.playSound(world, this.getBlockPos(), SoundEvents.BLOCK_BEACON_DEACTIVATE, 1.5f);
         }
@@ -113,12 +112,12 @@ public class TickerEntity extends Entity {
         if (!this.world.isClient) {
             // This disgusting assortment of mins and maxxes basically does...
             // 1 <-> level <-> (max_level, which itself is maxxed at 20)
-            this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), TIAB.config.getMaxLevel()), 1));
+            this.getDataTracker().set(LEVEL, Math.max(Math.min(Math.min(level, 20), Main.config.getMaxLevel()), 1));
         }
     }
 
     public int getLevel(){
-        return (Integer) this.getDataTracker().get(LEVEL);
+        return this.getDataTracker().get(LEVEL);
     }
 
     @Override

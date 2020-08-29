@@ -1,22 +1,27 @@
 package red.jad.tiab.config;
 
-import red.jad.tiab.backend.Helpers;
-
 /*
     Used if AutoConfig is not present.
     Constants that cannot be configured due to no AutoConfig.
  */
 public class DefaultConfig {
-    // Enumerators
+    // enums
     public enum effectType { CLOCK, PARTICLES, BOTH }
     public enum displayWhen { HOVER, ALWAYS, NEVER }
 
+    // client
     public effectType getEffectType(){              return effectType.CLOCK; }
     public int getVolume(){                         return 50; }
-    public displayWhen getDisplayWhen(){            return displayWhen.HOVER; }
-    public int getVerticalOffset(){                 return -16; }
-    public int getColor(){                          return 0xffffff; }
 
+    // hud
+    public displayWhen getDisplayWhen(){            return displayWhen.HOVER; }
+    public int getColor(){                          return 0xffffff; }
+    public boolean getShadow(){                     return true; }
+    public float getSpeed(){                        return 4; }
+    public float getScale(){                        return 1; }
+    public int getVerticalOffset(){                 return -16; }
+
+    // gameplay
     public boolean getAccelerateBlockEntities(){    return true; }
     public boolean getAccelerateRandomly(){         return true; }
     public boolean getCancelIfInvalid(){            return true; }
