@@ -4,22 +4,22 @@ import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
-import red.jad.tiab.TIAB;
+import red.jad.tiab.Main;
 
 /*
     Only used when AutoConfig is present
     Overrides getters from DefaultConfig class
  */
-@Config(name = TIAB.MOD_ID)
+@Config(name = Main.MOD_ID)
 @Config.Gui.Background("minecraft:textures/block/light_blue_concrete_powder.png")
 public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
     Client client = new Client();
 
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = false)
+    @ConfigEntry.Gui.CollapsibleObject()
     Gameplay gameplay = new Gameplay();
-    private class Client implements ConfigData {
+    public static class Client implements ConfigData {
 
         @Comment("CLOCK: Rotating clock on all sides of the block. PARTICLES: Flashing particles on every corner of the block. BOTH: Both effects at the same time")
         @ConfigEntry.Gui.Tooltip(count = 3)
@@ -32,24 +32,41 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
         public HUDConfig hud = new HUDConfig();
 
-        class HUDConfig implements ConfigData {
+        public static class HUDConfig implements ConfigData {
 
             @Comment("HOVER: Display when hovering over a valid block. ALWAYS: Display when holding the Time in a Bottle. NEVER: Don't display HUD")
             @ConfigEntry.Gui.Tooltip(count = 3)
             @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
             public displayWhen display_when = displayWhen.HOVER;
 
+            @ConfigEntry.ColorPicker
+            public int color = 0xffffff;
+
+            public boolean shadow = true;
+
+            public float speed = 4;
+
+            public float scale = 1;
+
             @Comment("Vertical offset of the HUD from the center of the screen")
             @ConfigEntry.Gui.Tooltip
             public int vertical_offset = -16;
-
-            @ConfigEntry.ColorPicker
-            public int color = 0xffffff;
         }
     }
+    // client
+    @Override public effectType getEffectType(){ return this.client.effect_type; }
+    @Override public int getVolume(){ return this.client.volume; }
+
+    // hud
+    @Override public displayWhen getDisplayWhen(){ return this.client.hud.display_when; }
+    @Override public int getColor(){ return this.client.hud.color; }
+    @Override public boolean getShadow(){ return this.client.hud.shadow; }
+    @Override public float getSpeed(){ return this.client.hud.speed; }
+    @Override public float getScale(){ return this.client.hud.scale; }
+    @Override public int getVerticalOffset(){ return this.client.hud.vertical_offset; }
 
 
-    private class Gameplay implements ConfigData {
+    public static class Gameplay implements ConfigData {
         @Comment("Will the Time in a Bottle accelerate block entites? (e.g. furnaces, brewing stands, etc.)")
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean accelerate_block_entities = true;
@@ -88,34 +105,14 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
         public int random_acceleration_range = 1365;
     }
 
-    @Override
-    public effectType getEffectType(){ return this.client.effect_type; }
-    @Override
-    public int getVolume(){ return this.client.volume; }
-    @Override
-    public displayWhen getDisplayWhen(){ return this.client.hud.display_when; }
-    @Override
-    public int getVerticalOffset(){ return this.client.hud.vertical_offset; }
-    @Override
-    public int getColor(){ return this.client.hud.color; }
-
-    @Override
-    public boolean getAccelerateBlockEntities(){ return this.gameplay.accelerate_block_entities; }
-    @Override
-    public boolean getAccelerateRandomly(){ return this.gameplay.accelerate_randomly; }
-    @Override
-    public boolean getCancelIfInvalid(){ return this.gameplay.cancel_if_invalid; }
-    @Override
-    public boolean getOneBottleAtATime(){ return this.gameplay.one_bottle_at_a_time; }
-    @Override
-    public int getUpdateFrequency(){ return this.gameplay.update_frequency; }
-    @Override
-    public int getAccelerationDuration(){ return this.gameplay.acceleration_duration; }
-    @Override
-    public int getAccelerationBase(){ return this.gameplay.acceleration_base; }
-    @Override
-    public int getMaxLevel(){ return this.gameplay.max_level; }
-    @Override
-    public int getRandomAccelerationRange(){ return this.gameplay.random_acceleration_range; }
+    @Override public boolean getAccelerateBlockEntities(){ return this.gameplay.accelerate_block_entities; }
+    @Override public boolean getAccelerateRandomly(){ return this.gameplay.accelerate_randomly; }
+    @Override public boolean getCancelIfInvalid(){ return this.gameplay.cancel_if_invalid; }
+    @Override public boolean getOneBottleAtATime(){ return this.gameplay.one_bottle_at_a_time; }
+    @Override public int getUpdateFrequency(){ return this.gameplay.update_frequency; }
+    @Override public int getAccelerationDuration(){ return this.gameplay.acceleration_duration; }
+    @Override public int getAccelerationBase(){ return this.gameplay.acceleration_base; }
+    @Override public int getMaxLevel(){ return this.gameplay.max_level; }
+    @Override public int getRandomAccelerationRange(){ return this.gameplay.random_acceleration_range; }
 
 }

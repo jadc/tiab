@@ -24,6 +24,9 @@ dependencies {
 	// Optional Dependencies
 	modApi "me.sargunvohra.mcmods:autoconfig1u:${project.auto_config_version}"
 	modImplementation "io.github.prospector:modmenu:${project.mod_menu_version}"
+	modApi("me.shedaniel.cloth:config-2:${project.cloth_config_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 }
 
 processResources {
