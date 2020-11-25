@@ -30,7 +30,7 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
 
     @Override
     public Identifier getTexture(TickerEntity entity) {
-        return SpriteAtlasTexture.BLOCK_ATLAS_TEX;
+        return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
     }
 
     @Override
