@@ -1,6 +1,5 @@
 package red.jad.tiab.client;
 
-import com.google.gson.internal.$Gson$Preconditions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,13 +11,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 import red.jad.tiab.Main;
 import red.jad.tiab.backend.Helpers;
-import red.jad.tiab.mixin.InGameHudAccessor;
 import red.jad.tiab.config.DefaultConfig;
+import red.jad.tiab.mixin.InGameHudAccessor;
 import red.jad.tiab.objects.items.TimeBottleItem;
 
 /*
@@ -33,11 +31,8 @@ public class TimeTooltip {
         return new TranslatableText("tooltip.tiab.time_in_a_bottle", isInfinite ? new TranslatableText("tooltip.tiab.time_in_a_bottle.infinity").getString() : new LiteralText(Helpers.ticksToTime(time)));
     }
 
-    private static final float fade_length = 2.0f;
-    private static final float offset_distance = -2.0f;
-
     private static float fade = 0;
-    private static float offset = offset_distance;
+    private static float offset = Main.config.getAnimationOffset();
     private static float now = 0;
 
     @Environment(EnvType.CLIENT)
@@ -46,7 +41,7 @@ public class TimeTooltip {
         if(client.player == null) return false;
         if(client.player.getMainHandStack() == null) return false;
 
-        // TODO: Allow offhand
+        // TODO: both hands
         boolean holding = client.player.getMainHandStack().getItem().equals(Main.TIME_IN_A_BOTTLE);
 
         if(Main.config.getDisplayWhen() == DefaultConfig.displayWhen.HOVER){
@@ -64,21 +59,22 @@ public class TimeTooltip {
     public static void render(MatrixStack matrices, float delta){
         MinecraftClient client = MinecraftClient.getInstance();
 
-        float before = now;
-        now = MinecraftClient.getInstance().world.getTime() + delta;
+        float before = now; now = MinecraftClient.getInstance().world.getTime() + delta;
         float td = (now - before) * Main.config.getSpeed();
 
         int direction = shouldRender(client) ? 1 : -1;
 
-        fade += td * direction;
+        fade += td * direction / Math.abs(Main.config.getAnimationOffset() / 5);
         fade = Math.max(Math.min(fade, 10.0f), 0);
         offset += (td/4) * direction;
-        offset = Math.max(Math.min(offset, 0), offset_distance);
+        offset = Math.max(Math.min(offset, 10.0f), 0); // todo: fix
 
         if(fade > 0){
             client.getProfiler().push(Main.id("time_tooltip").toString());
 
+            // TODO: both hands
             MutableText text = getText(client.world, client.player.getMainHandStack(), client.player.isCreative());
+
             matrices.push();
             matrices.translate(0, -offset, 0);
             renderText(client.inGameHud, matrices, text.getString());

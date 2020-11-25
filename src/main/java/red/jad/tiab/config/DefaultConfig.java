@@ -18,6 +18,7 @@ public class DefaultConfig {
     public int getColor(){                          return 0xffffff; }
     public boolean getShadow(){                     return true; }
     public float getSpeed(){                        return 4; }
+    public float getAnimationOffset(){              return -2; }
     public float getScale(){                        return 1; }
     public int getVerticalOffset(){                 return -16; }
 

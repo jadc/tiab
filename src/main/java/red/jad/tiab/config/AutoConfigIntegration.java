@@ -46,6 +46,8 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
 
             public float speed = 4;
 
+            public float animation_offset = 2;
+
             public float scale = 1;
 
             @Comment("Vertical offset of the HUD from the center of the screen")
@@ -62,6 +64,7 @@ public class AutoConfigIntegration extends DefaultConfig implements ConfigData {
     @Override public int getColor(){ return this.client.hud.color; }
     @Override public boolean getShadow(){ return this.client.hud.shadow; }
     @Override public float getSpeed(){ return this.client.hud.speed; }
+    @Override public float getAnimationOffset(){ return this.client.hud.animation_offset; }
     @Override public float getScale(){ return this.client.hud.scale; }
     @Override public int getVerticalOffset(){ return this.client.hud.vertical_offset; }
 
